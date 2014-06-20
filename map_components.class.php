@@ -1,5 +1,5 @@
 <?php
-class map_compontnts extends EditorHandler {
+class map_components extends EditorHandler {
 	var $editor_sequence = '0';
 	var $component_path = '';
 
@@ -42,6 +42,18 @@ class map_compontnts extends EditorHandler {
 			}
 		}
 		$this->langtype = str_replace($this->xe_langtype, $this->google_langtype, strtolower(Context::getLangType()));
+	}
+
+	function xml_api_request($uri, $headers = null) {
+		$xml = '';
+		$xml = FileHandler::getRemoteResource($uri, null, 3, 'GET', 'application/xml', $headers);
+
+		$xml = preg_replace("/<\?xml([.^>]*)\?>/i", "", $xml);
+
+		$oXmlParser = new XmlParser();
+		$xml_doc = $oXmlParser->parse($xml);
+
+		return $xml_doc;
 	}
 
 	function search() {
