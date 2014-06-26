@@ -1,4 +1,4 @@
-/* Map Component by Misol. (c) 2011 MinSoo Kim. (misol.kr@gmail.com) */
+/* Map Components by Misol. (c) 2014 MinSoo Kim. (misol.kr@gmail.com) */
 var map_zoom = 13, map_lat = '', map_lng = '', marker_latlng = '', map = '', marker = '', saved_location = new Array(), result_array = new Array(), infowindow = '', result_from = '';
 
 function soo_save_location(i,j) { //위치 정보를 배열로 저장
