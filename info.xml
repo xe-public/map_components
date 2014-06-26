@@ -2,8 +2,8 @@
 <component version="0.2">
 	<title xml:lang="ko">지도</title>
 	<title xml:lang="en">Maps</title>
-	<description xml:lang="ko">지도를 원하는 곳에 추가하거나 수정할 수 있습니다.</description>
-	<description xml:lang="en">Maps can be inserted in your documents.</description>
+	<description xml:lang="ko">지도를 원하는 곳에 추가하거나 수정할 수 있습니다. Google Maps API, 네이버 지도 API, 다음 지도 API, 다음 로컬 API 등이 사용되었습니다.</description>
+	<description xml:lang="en">Maps can be inserted in your documents. Google Maps API, Naver Maps API, Daum Maps API, Daum Local API and some other APIs are included.</description>
 	<version>1.0</version>
 	<date>2014-06-20</date>
 	<license link="http://www.gnu.org/licenses/gpl-3.0.html">GPLv3</license>
