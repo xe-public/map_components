@@ -234,7 +234,7 @@ class map_components extends EditorHandler {
 		if(trim($this->soo_maptypecontrol)) $maptypeCtrl = 'false';
 		else $maptypeCtrl = 'true';
 
-		$header_script = '<style>.gmnoprint div[title^="Pan"],.gmnoprint div[title^="이동"],.gmnoprint div[title^="축소"] {opacity: 0 !important;}</style>';
+		$header_script = '<style>.gmnoprint div[title^="Pan"],.gmnoprint div[title~="이동"] {opacity: 0 !important;}</style>';
 		if($map_count==1) {
 
 			//language setting
