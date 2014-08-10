@@ -48,6 +48,22 @@ class map_components extends EditorHandler {
 		$this->langtype = str_replace($this->xe_langtype, $this->google_langtype, strtolower(Context::getLangType()));
 	}
 
+	function encode_data() {
+		$data = Context::gets('map_center', 'width', 'height', 'map_markers', 'map_zoom');
+		if(!$data) return;
+		$data = base64_encode(serialize($data));
+
+		$this->add("results", $data);
+	}
+
+	function decode_data() {
+		$data = Context::get('data');
+		if(!$data) return;
+		$data = unserialize(base64_decode($data));
+
+		$this->add("results", $data);
+	}
+
 	function xml_api_request($uri, $headers = null) {
 		$xml = '';
 		$xml = FileHandler::getRemoteResource($uri, null, 3, 'GET', 'application/xml', $headers);
@@ -218,6 +234,7 @@ class map_components extends EditorHandler {
 			$map_count=$map_count+1;
 		}
 		Context::set('google_map_count' , $map_count);
+		$data = unserialize(base64_decode($xml_obj->attrs->alt));
 
 		//지도 표시 시작 start viewing the map.
 		$style = trim($xml_obj->attrs->style).';';
@@ -268,20 +285,20 @@ class map_components extends EditorHandler {
 
 			$header_script .= '<script src="https://maps-api-ssl.google.com/maps/api/js?sensor=false&amp;language='.$google_langtype.'"></script><style type="text/css">span.soo_maps {display:block;} span.soo_maps img {max-width:none;}span.soo_maps>a>img {max-width:100%;}</style>'."\n";
 		}
-		if(!$xml_obj->attrs->location_no) { // 단일 위치 지도 one pointed map
-			$map_center = explode(',', trim($xml_obj->attrs->map_center));
+		if(!$data->location_no) { // 단일 위치 지도 one pointed map
+			$map_center = explode(',', trim($data->map_center));
 			$lat = $map_center[0];
 			settype($lat,"float");
 			$lng = $map_center[1];;
 			settype($lng,"float");
 
-			$map_markers = explode(',', trim($xml_obj->attrs->map_markers));
+			$map_markers = explode(',', trim($data->map_markers));
 			
 			$marker_lat = $map_markers[0];
 			settype($marker_lat,"float");
 			$marker_lng = $map_markers[1];
 			settype($marker_lng,"float");
-			$zoom = trim($xml_obj->attrs->map_zoom);
+			$zoom = trim($data->map_zoom);
 			settype($zoom,"int");
 
 			//$altMapLinkParas .= sprintf('&amp;location_no=1&amp;ment=%s&amp;map_lat=%s&amp;map_lng=%s&amp;marker_lng=%s&amp;marker_lat=%s&amp;map_zoom=%s',urlencode(),$lat,$lng,$marker_lng,$marker_lat,$zoom);
@@ -308,23 +325,23 @@ class map_components extends EditorHandler {
 				$header_script .= '}</script>';
 			Context::addHtmlHeader($header_script);
 		} else { // 다중 위치 지도 map of numerous point
-			settype($xml_obj->attrs->location_no,"int");
+			settype($data->location_no,"int");
 			$map_locations = array();
 
 			$header_script .= '<script>'.
 				'function ggl_map_init'.$map_count.'() {'.
 					'var mapOption = { zoom:8,mapTypeControl: '.$maptypeCtrl.', mapTypeId: google.maps.MapTypeId.ROADMAP };'.
 					'var infowindow = new google.maps.InfoWindow({content: ""}); var ggl_map'.$map_count.' = new google.maps.Map(document.getElementById("ggl_map_canvas'.$map_count.'"), mapOption);'."\n";
-				for($i=0;$i<$xml_obj->attrs->location_no;$i++) {
-					$lat = trim($xml_obj->attrs->{'map_lat'.$i});
+				for($i=0;$i<$data->location_no;$i++) {
+					$lat = trim($data->{'map_lat'.$i});
 					settype($lat,"float");
-					$lng = trim($xml_obj->attrs->{'map_lng'.$i});
+					$lng = trim($data->{'map_lng'.$i});
 					settype($lng,"float");
-					$marker_lng = trim($xml_obj->attrs->{'marker_lng'.$i});
+					$marker_lng = trim($data->{'marker_lng'.$i});
 					settype($marker_lng,"float");
-					$marker_lat = trim($xml_obj->attrs->{'marker_lat'.$i});
+					$marker_lat = trim($data->{'marker_lat'.$i});
 					settype($marker_lat,"float");
-					$zoom = trim($xml_obj->attrs->{'map_zoom'.$i});
+					$zoom = trim($data->{'map_zoom'.$i});
 					settype($zoom,"int");
 					if(!$lat || !$lng || !$marker_lng || !$marker_lat || !$zoom) {
 						return 'f';
