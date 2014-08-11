@@ -1,30 +1,32 @@
 /* Map Component by MinSoo Kim. (c) 2014 MinSoo Kim. (misol.kr@gmail.com) */
-var map_zoom = 13, map_lat = '', map_lng = '', marker_latlng = '', map = '', marker = '', saved_location = new Array(), result_array = new Array(), infowindow = '', result_from = '';
-var test_var = new Array();
-function soo_save_location(i,j) { //위치 정보를 배열로 저장
-	i = parseInt(i,10);
-	if(j!=1) {
-		saved_location['zoom'] = map.getZoom();
-		saved_location['center'] = new Array();
-		saved_location['center']['lat'] = map.getCenter().lat();
-		saved_location['center']['lng'] = map.getCenter().lng();
+var map_zoom = 13, map_lat = '', map_lng = '', marker_latlng = '', map = '', marker = '', map_markers = new Array(), map_marker_positions = '', saved_location = new Array(), result_array = new Array(), infowindow = '', result_from = '';
+/*
 
-		saved_location[i] = new Array();
-		saved_location[i]['lat'] = marker_latlng.lat();
-		saved_location[i]['lng'] = marker_latlng.lng();
-	}
-}
+** 2014 08 11 TODO LIST **
 
+map_marker_positions 는 lat,lng;lat,lng; 형식으로 마커들의 위치를 모두 포함하는 컨테이너.
+- 지도 처음 로딩시 마커 하나도 없음
+- 마커가 추가될 때 위치 추가
+- 마커가 제거될 때 위치 제거
+- 마커 이동은 제거 후 추가로 간주.
+- 검색 결과에서 결과 항목을 클릭하는 것은 지도 위치만 이동.
+
+
+마커를 움직이면, 처음 마커 위치를 map_marker_positions 에서 찾아서, 움직임이 끝난 곳의 위치로 치환.
+마커를 더블클릭하면 map_marker_positions 에서 찾아서 마커를 삭제하고, 맵에서도 마커 삭제
+지도를 더블클릭하면 더블클릭한 위치에 마커 생성하고 map_marker_positions 에서 마커 추가.
+*/
 function map_point(i) { //검색된 위치 정보를 배열에서 로드
 	center = result_array[i].geometry.location;
 
 	map.setCenter(center);
 	latlng = center;
-	marker.setMap(null);
 	marker_latlng = result_array[i].geometry.location;
+	marker_code = marker_latlng.lat() + marker_latlng.lng();
+	marker.setMap(null);
 	marker = new google.maps.Marker({
 		position: marker_latlng, 
-		map: map, 
+		map: map,
 		draggable: true
 	});
 	soo_marker_event();
@@ -107,8 +109,7 @@ function soo_marker_event() {
 		infowindow.close();
 	});
 	google.maps.event.addListener(marker, "dragend", function(event) {
-	
-	if(event.latLng) {
+		if(event.latLng) {
 			geocoder.geocode({'latLng': event.latLng}, function(rst, stat) {
 				if (stat == google.maps.GeocoderStatus.OK) {
 					if (rst[1]) {
@@ -118,7 +119,7 @@ function soo_marker_event() {
 					}
 					else {
 						infowindow.close();
-						infowindow = new google.maps.InfoWindow({ content: dragmarkertext });
+						infowindow = new google.maps.InfoWindow({ content: soo_about_marker });
 						infowindow.open(map,marker);
 					}
 				}
@@ -153,7 +154,6 @@ function getMaps() {
 		var response_tags = new Array('error','message','results');
 		exec_xml('editor', 'procEditorCall', img_var, function(ret_obj,b) {
 				img_data = ret_obj['results'];
-				test_var = ret_obj['results'];
 
 				saved_location['zoom'] = img_data['map_zoom'];
 
@@ -225,34 +225,6 @@ function getMaps() {
 
 				map.setZoom(map_zoom);
 
-				google.maps.event.addListener(map, 'dragend', function() {
-					center = map.getCenter();
-					jQuery("#lng").val(center.lng());
-					jQuery("#lat").val(center.lat());
-					jQuery("#map_zoom").val(map.getZoom());
-					var bounds = map.getBounds();
-					var southWest = bounds.getSouthWest();
-					var northEast = bounds.getNorthEast();
-					if((latlng.lng()<southWest.lng() || northEast.lng()<latlng.lng()) || (latlng.lat()<southWest.lat() || northEast.lat()<latlng.lat())) {
-						marker.setMap(null);
-						infowindow.close();
-						latlng = center;
-						marker_latlng = latlng;
-						marker = new google.maps.Marker({
-							position: center, 
-							map: map,
-							draggable: true
-						});
-						marker.setMap(map);
-						infowindow = new google.maps.InfoWindow({
-							content: dragmarkertext,
-							disableAutoPan: true
-						});
-						infowindow.open(map,marker);
-						soo_marker_event();
-					}
-				});
-
 				marker = new google.maps.Marker({
 						position: latlng,
 						map: map, 
@@ -279,53 +251,79 @@ function getMaps() {
 		jQuery("#width").val('600');
 		jQuery("#height").val('400');
 		latlng = center;
-				map.setZoom(map_zoom);
+		map.setZoom(map_zoom);
 
-				google.maps.event.addListener(map, 'dragend', function() {
-					center = map.getCenter();
-					jQuery("#lng").val(center.lng());
-					jQuery("#lat").val(center.lat());
-					jQuery("#map_zoom").val(map.getZoom());
-					var bounds = map.getBounds();
-					var southWest = bounds.getSouthWest();
-					var northEast = bounds.getNorthEast();
-					if((latlng.lng()<southWest.lng() || northEast.lng()<latlng.lng()) || (latlng.lat()<southWest.lat() || northEast.lat()<latlng.lat())) {
-						marker.setMap(null);
-						infowindow.close();
-						latlng = center;
-						marker_latlng = latlng;
-						marker = new google.maps.Marker({
-							position: center, 
-							map: map,
-							draggable: true
-						});
-						marker.setMap(map);
-						infowindow = new google.maps.InfoWindow({
-							content: dragmarkertext,
-							disableAutoPan: true
-						});
-						infowindow.open(map,marker);
-						soo_marker_event();
-					}
-				});
-
-				marker = new google.maps.Marker({
-						position: latlng,
-						map: map, 
-						draggable: true
-					});
-				soo_marker_event();
-				marker.setMap(map);
-				geocoder = new google.maps.Geocoder();
-				jQuery("#lng").val(center.lng());
-				jQuery("#lat").val(center.lat());
-				jQuery("#map_zoom").value = map.getZoom();
-				marker_latlng = latlng;
-				infowindow.close();
+		marker = new google.maps.Marker({
+				position: latlng,
+				map: map, 
+				draggable: true
+			});
+		soo_marker_event();
+		marker.setMap(map);
+		geocoder = new google.maps.Geocoder();
+		jQuery("#lng").val(center.lng());
+		jQuery("#lat").val(center.lat());
+		jQuery("#map_zoom").value = map.getZoom();
+		marker_latlng = latlng;
+		infowindow.close();
 
 	}
 
-/* === === === == = = = = = = = =  */
+	google.maps.event.addListener(map, 'dragend', function() {
+		center = map.getCenter();
+		jQuery("#lng").val(center.lng());
+		jQuery("#lat").val(center.lat());
+		jQuery("#map_zoom").val(map.getZoom());
+		var bounds = map.getBounds();
+		var southWest = bounds.getSouthWest();
+		var northEast = bounds.getNorthEast();
+		if((latlng.lng()<southWest.lng() || northEast.lng()<latlng.lng()) || (latlng.lat()<southWest.lat() || northEast.lat()<latlng.lat())) {
+			marker.setMap(null);
+			infowindow.close();
+			latlng = center;
+			marker_latlng = latlng;
+			marker = new google.maps.Marker({
+				position: center, 
+				map: map,
+				draggable: true
+			});
+			marker.setMap(map);
+			infowindow = new google.maps.InfoWindow({
+				content: dragmarkertext,
+				disableAutoPan: true
+			});
+			infowindow.open(map,marker);
+			soo_marker_event();
+		}
+	});
+	google.maps.event.addListener(map, 'dblclick', function(event) {
+		center = event.latLng;
+		jQuery("#lng").val(center.lng());
+		jQuery("#lat").val(center.lat());
+		jQuery("#map_zoom").val(map.getZoom());
+		var bounds = map.getBounds();
+		var southWest = bounds.getSouthWest();
+		var northEast = bounds.getNorthEast();
+		if((latlng.lng()<southWest.lng() || northEast.lng()<latlng.lng()) || (latlng.lat()<southWest.lat() || northEast.lat()<latlng.lat())) {
+			marker.setMap(null);
+			infowindow.close();
+			latlng = center;
+			marker_latlng = latlng;
+			marker = new google.maps.Marker({
+				position: event.latLng, 
+				map: map,
+				draggable: true
+			});
+			marker.setMap(map);
+			infowindow = new google.maps.InfoWindow({
+				content: dragmarkertext,
+				disableAutoPan: true
+			});
+			infowindow.open(map,marker);
+			soo_marker_event();
+		}
+	});
+
 }
 function insertMap(obj) {
 	if(typeof(opener)=="undefined" || !opener) return;

@@ -171,43 +171,14 @@ class map_components extends EditorHandler {
 			$this->map_comp_lng = -97;
 		}
 
-		//language setting
-		$xe_langtype = array(
-			'ko',
-			'en',
-			'zh-tw',
-			'zh-cn',
-			'jp',
-			'es',
-			'fr',
-			'ru',
-			'vi',
-			'mn',
-			'tr'
-		);
-		$google_langtype = array(
-			'ko',
-			'en',
-			'zh-Hant',
-			'zh-Hans',
-			'ja',
-			'es',
-			'fr',
-			'ru',
-			'vi',
-			'en', // google does not not support
-			'tr'
-		);
-		$google_langtype = str_replace($xe_langtype, $google_langtype, strtolower(Context::getLangType()));
-
-		$map_comp_header_script = '<script src="https://maps-api-ssl.google.com/maps/api/js?sensor=false&amp;language='.$google_langtype.'"></script>';
+		$map_comp_header_script = '<script src="https://maps-api-ssl.google.com/maps/api/js?sensor=false&amp;language='.$this->langtype.'"></script>';
 		$map_comp_header_script .= '<script>'.
 			sprintf(
 				'var defaultlat="%s";'.
 				'var defaultlng="%s";'
 				,$this->map_comp_lat,$this->map_comp_lng).
 			'</script>';
-		Context::set('soo_langcode',$google_langtype);
+		Context::set('soo_langcode',$this->langtype);
 		Context::set('tpl_path', $tpl_path);
 		Context::addHtmlHeader($map_comp_header_script);
 		$oTemplate = &TemplateHandler::getInstance();
@@ -253,37 +224,7 @@ class map_components extends EditorHandler {
 
 		$header_script = '<style>.gmnoprint div[title^="Pan"],.gmnoprint div[title~="이동"] {opacity: 0 !important;}</style>';
 		if($map_count==1) {
-
-			//language setting
-			$xe_langtype = array(
-				'ko',
-				'en',
-				'zh-tw',
-				'zh-cn',
-				'jp',
-				'es',
-				'fr',
-				'ru',
-				'vi',
-				'mn',
-				'tr'
-			);
-			$google_langtype = array(
-				'ko',
-				'en',
-				'zh-Hant',
-				'zh-Hans',
-				'ja',
-				'es',
-				'fr',
-				'ru',
-				'vi',
-				'en', // google does not not support
-				'tr'
-			);
-			$google_langtype = str_replace($xe_langtype, $google_langtype, strtolower(Context::getLangType()));
-
-			$header_script .= '<script src="https://maps-api-ssl.google.com/maps/api/js?sensor=false&amp;language='.$google_langtype.'"></script><style type="text/css">span.soo_maps {display:block;} span.soo_maps img {max-width:none;}span.soo_maps>a>img {max-width:100%;}</style>'."\n";
+			$header_script .= '<script src="https://maps-api-ssl.google.com/maps/api/js?sensor=false&amp;language='.$this->langtype.'"></script><style type="text/css">span.soo_maps {display:block;} span.soo_maps img {max-width:none;}span.soo_maps>a>img {max-width:100%;}</style>'."\n";
 		}
 		if(!$data->location_no) { // 단일 위치 지도 one pointed map
 			$map_center = explode(',', trim($data->map_center));
@@ -312,7 +253,6 @@ class map_components extends EditorHandler {
 						'marker_lat' => $marker_lat,
 						'map_zoom' => $zoom
 						);
-			$altMapLinkParas = $this->getMobileMaps($map_locations);
 
 			$header_script .= '<script>'.
 				'function ggl_map_init'.$map_count.'() {'.
@@ -372,24 +312,22 @@ class map_components extends EditorHandler {
 					$header_script .=  '});'.'ggl_marker'.$map_count.'_'.$i.'.setMap(ggl_map'.$map_count.');'."\n";
 				}
 
-				$altMapLinkParas = $this->getMobileMaps($map_locations);
-
 				$header_script .= '}</script>';
 			Context::addHtmlHeader($header_script);
 		}
 
-		if(Context::getResponseMethod() != 'HTML' || $this->mobile_set == true) {
-			if(count($altMapLinkParas) > 0)
+		if(Context::getResponseMethod() != 'HTML') {
+			if(count($map_locations) > 0)
 			{
 				$view_code = '';
-				foreach($altMapLinkParas as $key => $point)
+				foreach($map_locations as $key => $location)
 				{
-					$location = $map_locations[$key];
 					$style = 'text-align:center; width: 100%; margin:15px 0px;';
-					$view_code .= '<span style="'.$style.'" class="soo_maps"><a href="'.$altMapLinkParas[0].'" target="_blank"><img src="'.
-						htmlspecialchars($this->getImageMapLink(($location['map_lat'].','.$location['map_lng']), ($location['marker_lat'].','.$location['marker_lng']), $location['map_zoom'], $width, $height)).'" />'.Context::getLang('view_map').'</a></span><br />';
+					$view_code .= '<div style="'.$style.'" class="soo_maps"><img src="'.htmlspecialchars($this->getImageMapLink(($location['map_lat'].','.$location['map_lng']), ($location['marker_lat'].','.$location['marker_lng']), $location['map_zoom'], $width, $height)).'" /></div>';
 				}
 			}
+		} elseif(Context::get('act') == 'dispPageAdminContentModify') {
+			$view_code = sprintf("<img src='%s' width='%d' height='%d' alt='Map Component' />",str_replace('&amp;amp;','&amp;',htmlspecialchars($xml_obj->attrs->src)), $width, $height);
 		} else {
 			$view_code = '<span id="ggl_map_canvas'.$map_count.'" style="width: '.$width.'px; height: '.$height.'px" class="soo_maps"></span>'.
 				'<script>'.
@@ -514,67 +452,8 @@ class map_components extends EditorHandler {
 
 	}
 
-	function getMobileMaps($locations = array()) {
-		// 모바일용 링크 가져오기
-		$location_no = count($locations);
-		$return = array();
-		if($location_no < 1) return NULL;
-
-		foreach($locations as $key => $point) {
-			$lat = trim($point['map_lat']);
-			settype($lat,"float");
-			$lng = trim($point['map_lng']);
-			settype($lng,"float");
-			$marker_lng = trim($point['marker_lng']);
-			settype($marker_lng,"float");
-			$marker_lat = trim($point['marker_lat']);
-			settype($marker_lat,"float");
-			$zoom = trim($point['map_zoom']);
-			settype($zoom,"int");
-			if(!$lat || !$lng || !$marker_lng || !$marker_lat || !$zoom) {
-				break;
-			}
-
-			$return[$key] = htmlspecialchars($this->getGoogleMapLink(($lat.','.$lng), ($marker_lat.','.$marker_lng), $zoom));
-		}
-
-		return $return;
-	}
-
 	function getImageMapLink($center, $marker, $zoom, $width=320, $height=400) {
-		//language setting
-		$xe_langtype = array(
-			'ko',
-			'en',
-			'zh-tw',
-			'zh-cn',
-			'jp',
-			'es',
-			'fr',
-			'ru',
-			'vi',
-			'mn',
-			'tr'
-		);
-		$google_langtype = array(
-			'ko',
-			'en',
-			'zh-Hant',
-			'zh-Hans',
-			'ja',
-			'es',
-			'fr',
-			'ru',
-			'vi',
-			'en', // google does not not support
-			'tr'
-		);
-		$google_langtype = str_replace($xe_langtype, $google_langtype, strtolower(Context::getLangType()));
-		return sprintf("https://maps-api-ssl.google.com/maps/api/staticmap?language=%s&center=%s&zoom=%s&size=%sx%s&markers=size:mid|%s&sensor=false", $google_langtype, $center, $zoom, intval($width), intval($height), $marker);
-	}
-
-	function getGoogleMapLink($center, $marker, $zoom) {
-		return sprintf("https://maps.google.com?ll=%s&z=%s&q=@%s&iwloc=A&iwd=1", $center, $zoom, $marker);
+		return sprintf("https://maps-api-ssl.google.com/maps/api/staticmap?language=%s&center=%s&zoom=%s&size=%sx%s&markers=size:mid|%s&sensor=false", $this->langtype, $center, $zoom, intval($width), intval($height), $marker);
 	}
 
 }
