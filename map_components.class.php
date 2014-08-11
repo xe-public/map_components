@@ -1,9 +1,17 @@
 <?php
 // 이전에 구글 지도 컴포넌트를 변형해서 (저장 구조도 모두 바꿀 예정) 국내 지도에 잘 대응하는 컴포넌트 만들기 프로젝트.
+/*
+생각해볼 것
+한국인 경우 네이버 또는 다음 지도 사용.
+아닌 경우 구글 지도 사용
+
+한국인지 아닌지는 위도/경도로 구분.... - 필요할까?
+*/
 class map_components extends EditorHandler {
 	var $editor_sequence = '0';
 	var $component_path = '';
 	var $mobile_set = false;
+	var $maps_api_type = '';
 
 	var $langtype = '';
 		//language setting
@@ -193,18 +201,26 @@ class map_components extends EditorHandler {
 	 * DocumentModule::transContent() would call the transHTML() method.
 	 **/
 	function transHTML($xml_obj) {
-		// RSS, 모바일용 대체링크 문자열 (지울것)
-		//getMobileMaps() 이용할것.
-		$altMapLinkParas = array();
+		if(trim($this->soo_map_api))
+		{
+			if(strlen($this->soo_map_api) == 40)
+			{
+				$this->maps_api_type = 'daum';
+			}
+			elseif(strlen($this->soo_map_api) == 32)
+			{
+				$this->maps_api_type = 'naver';
+			}
+		}
 
 		//한 페이지 내에 지도 수
-		$map_count = Context::get('google_map_count');
+		$map_count = Context::get('pub_maps_count');
 		if(!$map_count) {
 			$map_count=1;
 		} else {
 			$map_count=$map_count+1;
 		}
-		Context::set('google_map_count' , $map_count);
+		Context::set('pub_maps_count' , $map_count);
 		$data = unserialize(base64_decode($xml_obj->attrs->alt));
 
 		//지도 표시 시작 start viewing the map.
@@ -219,12 +235,17 @@ class map_components extends EditorHandler {
 		if(!$height) $height = intval($xml_obj->attrs->height);
 		if(!$height) {$height = 400;}
 
-		if(trim($this->soo_maptypecontrol)) $maptypeCtrl = 'false';
-		else $maptypeCtrl = 'true';
-
 		$header_script = '<style>.gmnoprint div[title^="Pan"],.gmnoprint div[title~="이동"] {opacity: 0 !important;}</style>';
 		if($map_count==1) {
-			$header_script .= '<script src="https://maps-api-ssl.google.com/maps/api/js?sensor=false&amp;language='.$this->langtype.'"></script><style type="text/css">span.soo_maps {display:block;} span.soo_maps img {max-width:none;}span.soo_maps>a>img {max-width:100%;}</style>'."\n";
+			if($this->maps_api_type == 'daum')
+			{
+				$header_script .= '<script src="https://apis.daum.net/maps/maps3.js?apikey='.$this->soo_map_api.'"></script><style type="text/css">span.soo_maps {display:block;} span.soo_maps img {max-width:none;}span.soo_maps>a>img {max-width:100%;}</style>'."\n";
+			}
+			else
+			{
+				$header_script .= '<script src="https://maps-api-ssl.google.com/maps/api/js?sensor=false&amp;language='.$this->langtype.'"></script><style type="text/css">span.soo_maps {display:block;} span.soo_maps img {max-width:none;}span.soo_maps>a>img {max-width:100%;}</style>'."\n";
+			}
+			
 		}
 		if(!$data->location_no) { // 단일 위치 지도 one pointed map
 			$map_center = explode(',', trim($data->map_center));
@@ -242,9 +263,6 @@ class map_components extends EditorHandler {
 			$zoom = trim($data->map_zoom);
 			settype($zoom,"int");
 
-			//$altMapLinkParas .= sprintf('&amp;location_no=1&amp;ment=%s&amp;map_lat=%s&amp;map_lng=%s&amp;marker_lng=%s&amp;marker_lat=%s&amp;map_zoom=%s',urlencode(),$lat,$lng,$marker_lng,$marker_lat,$zoom);
-
-			//getMobileMaps() 이용할것.
 			$map_locations = array();
 			$map_locations[0] = array(
 						'map_lat' => $lat,
@@ -254,15 +272,33 @@ class map_components extends EditorHandler {
 						'map_zoom' => $zoom
 						);
 
-			$header_script .= '<script>'.
-				'function ggl_map_init'.$map_count.'() {'.
-					'var mapOption = { zoom: '.$zoom.', mapTypeControl: '.$maptypeCtrl.', mapTypeId: google.maps.MapTypeId.ROADMAP };'.
-					'var ggl_map'.$map_count.' = new google.maps.Map(document.getElementById("ggl_map_canvas'.$map_count.'"), mapOption);'.
-					'ggl_map'.$map_count.'.setCenter(new google.maps.LatLng('.$lat.', '.$lng.'));'.
-					'var ggl_markerlatlng'.$map_count.' = new google.maps.LatLng('.$marker_lat.', '.$marker_lng.');'.
-					'var ggl_marker'.$map_count.' = new google.maps.Marker({ position: ggl_markerlatlng'.$map_count.', map: ggl_map'.$map_count.', draggable: false});'.
-					'ggl_marker'.$map_count.'.setMap(ggl_map'.$map_count.');'."\n";
-				$header_script .= '}</script>';
+			if($this->maps_api_type == 'daum')
+			{
+				$zoom = intval(20-$zoom);
+				$header_script .= '<script>'.
+					'function ggl_map_init'.$map_count.'() {'.
+						'var mapOption = { level: '.$zoom.', center: new daum.maps.LatLng('.$lat.', '.$lng.') };'.
+						'var ggl_map'.$map_count.' = new daum.maps.Map(document.getElementById("ggl_map_canvas'.$map_count.'"), mapOption);'.
+						'var zoomControl = new daum.maps.ZoomControl();'.
+						'ggl_map'.$map_count.'.addControl(zoomControl, daum.maps.ControlPosition.LEFT);'.
+						'var mapTypeControl = new daum.maps.MapTypeControl();'.
+						'ggl_map'.$map_count.'.addControl(mapTypeControl, daum.maps.ControlPosition.TOPRIGHT);'.
+						'var ggl_marker'.$map_count.' = new daum.maps.Marker({ position: new daum.maps.LatLng('.$marker_lat.', '.$marker_lng.') });'.
+						'ggl_marker'.$map_count.'.setMap(ggl_map'.$map_count.');'.
+						'ggl_marker'.$map_count.'.setDraggable(FALSE);'.'}</script>';
+			}
+			else
+			{
+				$header_script .= '<script>'.
+					'function ggl_map_init'.$map_count.'() {'.
+						'var mapOption = { zoom: '.$zoom.', mapTypeId: google.maps.MapTypeId.ROADMAP };'.
+						'var ggl_map'.$map_count.' = new google.maps.Map(document.getElementById("ggl_map_canvas'.$map_count.'"), mapOption);'.
+						'ggl_map'.$map_count.'.setCenter(new google.maps.LatLng('.$lat.', '.$lng.'));'.
+						'var ggl_markerlatlng'.$map_count.' = new google.maps.LatLng('.$marker_lat.', '.$marker_lng.');'.
+						'var ggl_marker'.$map_count.' = new google.maps.Marker({ position: ggl_markerlatlng'.$map_count.', map: ggl_map'.$map_count.', draggable: false});'.
+						'ggl_marker'.$map_count.'.setMap(ggl_map'.$map_count.');'.'}</script>';
+			}
+
 			Context::addHtmlHeader($header_script);
 		} else { // 다중 위치 지도 map of numerous point
 			settype($data->location_no,"int");

@@ -13,12 +13,16 @@
 	</author>
 	<extra_vars>
 		<var name="soo_naver_map_api_key">
-			<title>네이버 지도 API Key</title>
+			<title>네이버 지도 API Key (장소 검색용)</title>
 			<description>http://dev.naver.com/openapi/register 에서 Naver API Key를 발급 받으신 후 입력해주세요.</description>
 		</var>
 		<var name="soo_daum_local_api_key">
-			<title>다음 로컬 API Key</title>
+			<title>다음 로컬 API Key (장소 검색용)</title>
 			<description>https://dna.daum.net/myapi/dataapi/new 에서 다음 데이터형 API 중 로컬 API Key를 발급 받으신 후 입력해주세요.</description>
+		</var>
+		<var name="soo_map_api">
+			<title>지도 API Key</title>
+			<description>https://dna.daum.net/myapi/mapsapi/new 에서 다음 지도형 API 중 JS 기반 지도 뷰를 발급 받으시거나, https://developer.naver.com/openapi/register.nhn 에서 지도 API 키를 발급받은 후 입력해주세요.</description>
 		</var>
 	</extra_vars>
 </component>
