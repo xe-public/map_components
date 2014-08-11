@@ -161,34 +161,67 @@ class map_components extends EditorHandler {
 	function getPopupContent() {
 		// 템플릿을 미리 컴파일해서 컴파일된 소스를 return. Compile the popup contents and return it.
 		$tpl_path = $this->component_path.'tpl';
-		$tpl_file = 'popup.html';
-
-		if(Context::getLangType() == 'ko') // Seoul
+		if(trim($this->soo_map_api))
 		{
+			if(strlen($this->soo_map_api) == 40)
+			{
+				$this->maps_api_type = 'daum';
+			}
+			elseif(strlen($this->soo_map_api) == 32)
+			{
+				$this->maps_api_type = 'naver';
+			}
+		}
+		if(!$this->maps_api_type)
+		{
+			$tpl_file = 'popup.html';
+
+			if(Context::getLangType() == 'ko') // Seoul
+			{
+				$this->map_comp_lat = 37.57;
+				$this->map_comp_lng = 126.98;
+			}
+			elseif(Context::getLangType() == 'zh-CN' || Context::getLangType() == 'zh-TW') // Beijing
+			{
+				$this->map_comp_lat = 39.55;
+				$this->map_comp_lng = 116.23;
+			}
+			else // United States
+			{
+				$this->map_comp_lat = 38;
+				$this->map_comp_lng = -97;
+			}
+
+			$map_comp_header_script = '<script src="https://maps-api-ssl.google.com/maps/api/js?sensor=false&amp;language='.$this->langtype.'"></script>';
+			$map_comp_header_script .= '<script>'.
+				sprintf(
+					'var defaultlat="%s";'.
+					'var defaultlng="%s";'
+					,$this->map_comp_lat,$this->map_comp_lng).
+				'</script>';
+			Context::set('soo_langcode',$this->langtype);
+			Context::set('tpl_path', $tpl_path);
+			Context::addHtmlHeader($map_comp_header_script);
+		}
+		else
+		{
+			$tpl_file = 'kr_map.html';
+
 			$this->map_comp_lat = 37.57;
 			$this->map_comp_lng = 126.98;
-		}
-		elseif(Context::getLangType() == 'zh-CN' || Context::getLangType() == 'zh-TW') // Beijing
-		{
-			$this->map_comp_lat = 39.55;
-			$this->map_comp_lng = 116.23;
-		}
-		else // United States
-		{
-			$this->map_comp_lat = 38;
-			$this->map_comp_lng = -97;
-		}
 
-		$map_comp_header_script = '<script src="https://maps-api-ssl.google.com/maps/api/js?sensor=false&amp;language='.$this->langtype.'"></script>';
-		$map_comp_header_script .= '<script>'.
-			sprintf(
-				'var defaultlat="%s";'.
-				'var defaultlng="%s";'
-				,$this->map_comp_lat,$this->map_comp_lng).
-			'</script>';
-		Context::set('soo_langcode',$this->langtype);
-		Context::set('tpl_path', $tpl_path);
-		Context::addHtmlHeader($map_comp_header_script);
+			$map_comp_header_script = '<script src="https://apis.daum.net/maps/maps3.js?apikey='.$this->soo_map_api.'"></script>';
+			$map_comp_header_script .= '<script>'.
+				sprintf(
+					'var defaultlat="%s";'.
+					'var defaultlng="%s";'
+					,$this->map_comp_lat,$this->map_comp_lng).
+				'</script>';
+			Context::set('soo_langcode', 'ko');
+			Context::set('maps_api_type', $this->maps_api_type);
+			Context::set('tpl_path', $tpl_path);
+			Context::addHtmlHeader($map_comp_header_script);
+		}
 		$oTemplate = &TemplateHandler::getInstance();
 		return $oTemplate->compile($tpl_path, $tpl_file);
 	}
@@ -285,7 +318,7 @@ class map_components extends EditorHandler {
 						'ggl_map'.$map_count.'.addControl(mapTypeControl, daum.maps.ControlPosition.TOPRIGHT);'.
 						'var ggl_marker'.$map_count.' = new daum.maps.Marker({ position: new daum.maps.LatLng('.$marker_lat.', '.$marker_lng.') });'.
 						'ggl_marker'.$map_count.'.setMap(ggl_map'.$map_count.');'.
-						'ggl_marker'.$map_count.'.setDraggable(FALSE);'.'}</script>';
+						'ggl_marker'.$map_count.'.setDraggable(false);'.'}</script>';
 			}
 			else
 			{
