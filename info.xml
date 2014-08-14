@@ -18,7 +18,7 @@
 		</var>
 		<var name="soo_map_api">
 			<title>지도 API Key</title>
-			<description>https://dna.daum.net/myapi/mapsapi/new 에서 지도 API 키를 발급받은 후 입력해주세요.</description>
+			<description>https://dna.daum.net/myapi/mapsapi/new 에서 다음 지도형 API 중 JS 기반 지도 뷰 API 키를 발급받은 후 입력해주세요.</description>
 		</var>
 	</extra_vars>
 </component>

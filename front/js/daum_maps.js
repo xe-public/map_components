@@ -1,7 +1,7 @@
 function addMarker(target_map, map_marker_positions) {
 	positions = makeLocationArray(map_marker_positions);
 
-	// 傈眉 付目 积己
+	// 鞝勳泊 毵堨护 靸濎劚
 	for(var i = 0; i < positions.length; i++)
 	{
 		var markers = new daum.maps.Marker({

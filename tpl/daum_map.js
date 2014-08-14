@@ -4,23 +4,23 @@ var map_zoom = 5, map_lat = '', map_lng = '', map = '', marker = '', map_markers
 
 ** 2014 08 11 TODO LIST **
 
-map_marker_positions ´Â lat,lng;lat,lng; Çü½ÄÀ¸·Î ¸¶Ä¿µéÀÇ À§Ä¡¸¦ ¸ðµÎ Æ÷ÇÔÇÏ´Â ÄÁÅ×ÀÌ³Ê.
-- Áöµµ Ã³À½ ·Îµù½Ã ¸¶Ä¿ ÇÏ³ªµµ ¾øÀ½
-- ¸¶Ä¿°¡ Ãß°¡µÉ ¶§ À§Ä¡ Ãß°¡
-- ¸¶Ä¿°¡ Á¦°ÅµÉ ¶§ À§Ä¡ Á¦°Å
-- ¸¶Ä¿ ÀÌµ¿Àº Á¦°Å ÈÄ Ãß°¡·Î °£ÁÖ.
-- °Ë»ö °á°ú¿¡¼­ °á°ú Ç×¸ñÀ» Å¬¸¯ÇÏ´Â °ÍÀº Áöµµ À§Ä¡¸¸ ÀÌµ¿.
+map_marker_positions ëŠ” lat,lng;lat,lng; í˜•ì‹ìœ¼ë¡œ ë§ˆì»¤ë“¤ì˜ ìœ„ì¹˜ë¥¼ ëª¨ë‘ í¬í•¨í•˜ëŠ” ì»¨í…Œì´ë„ˆ.
+- ì§€ë„ ì²˜ìŒ ë¡œë”©ì‹œ ë§ˆì»¤ í•˜ë‚˜ë„ ì—†ìŒ
+- ë§ˆì»¤ê°€ ì¶”ê°€ë  ë•Œ ìœ„ì¹˜ ì¶”ê°€
+- ë§ˆì»¤ê°€ ì œê±°ë  ë•Œ ìœ„ì¹˜ ì œê±°
+- ë§ˆì»¤ ì´ë™ì€ ì œê±° í›„ ì¶”ê°€ë¡œ ê°„ì£¼.
+- ê²€ìƒ‰ ê²°ê³¼ì—ì„œ ê²°ê³¼ í•­ëª©ì„ í´ë¦­í•˜ëŠ” ê²ƒì€ ì§€ë„ ìœ„ì¹˜ë§Œ ì´ë™.
 
 
-¸¶Ä¿¸¦ ¿òÁ÷ÀÌ¸é, Ã³À½ ¸¶Ä¿ À§Ä¡¸¦ map_marker_positions ¿¡¼­ Ã£¾Æ¼­, ¿òÁ÷ÀÓÀÌ ³¡³­ °÷ÀÇ À§Ä¡·Î Ä¡È¯.
-¸¶Ä¿¸¦ ´õºíÅ¬¸¯ÇÏ¸é map_marker_positions ¿¡¼­ Ã£¾Æ¼­ ¸¶Ä¿¸¦ »èÁ¦ÇÏ°í, ¸Ê¿¡¼­µµ ¸¶Ä¿ »èÁ¦
-Áöµµ¸¦ ´õºíÅ¬¸¯ÇÏ¸é ´õºíÅ¬¸¯ÇÑ À§Ä¡¿¡ ¸¶Ä¿ »ý¼ºÇÏ°í map_marker_positions ¿¡¼­ ¸¶Ä¿ Ãß°¡.
+ë§ˆì»¤ë¥¼ ì›€ì§ì´ë©´, ì²˜ìŒ ë§ˆì»¤ ìœ„ì¹˜ë¥¼ map_marker_positions ì—ì„œ ì°¾ì•„ì„œ, ì›€ì§ìž„ì´ ëë‚œ ê³³ì˜ ìœ„ì¹˜ë¡œ ì¹˜í™˜.
+ë§ˆì»¤ë¥¼ ë”ë¸”í´ë¦­í•˜ë©´ map_marker_positions ì—ì„œ ì°¾ì•„ì„œ ë§ˆì»¤ë¥¼ ì‚­ì œí•˜ê³ , ë§µì—ì„œë„ ë§ˆì»¤ ì‚­ì œ
+ì§€ë„ë¥¼ ë”ë¸”í´ë¦­í•˜ë©´ ë”ë¸”í´ë¦­í•œ ìœ„ì¹˜ì— ë§ˆì»¤ ìƒì„±í•˜ê³  map_marker_positions ì—ì„œ ë§ˆì»¤ ì¶”ê°€.
 */
-function map_point(i) { //°Ë»öµÈ À§Ä¡ Á¤º¸¸¦ ¹è¿­¿¡¼­ ·Îµå
+function map_point(i) { //ê²€ìƒ‰ëœ ìœ„ì¹˜ ì •ë³´ë¥¼ ë°°ì—´ì—ì„œ ë¡œë“œ
 	center = result_array[i].geometry.location;
 	map.setCenter(center);
 }
-function view_list() { //°Ë»öµÈ À§Ä¡ Á¤º¸¸¦ ¹è¿­¿¡¼­ ¸®½ºÆ®·Î »Ñ¸²
+function view_list() { //ê²€ìƒ‰ëœ ìœ„ì¹˜ ì •ë³´ë¥¼ ë°°ì—´ì—ì„œ ë¦¬ìŠ¤íŠ¸ë¡œ ë¿Œë¦¼
 	var html = '';
 	if(result_array.length == 0) 
 	{
@@ -140,11 +140,11 @@ function getMaps() {
 
 }
 
-/* »õ·Î¿î À§Ä¡¿¡ ¸¶Ä¿ Ãß°¡. latlng = 0 ÀÎ °æ¿ì, map_marker_positions ¿¡ ÁöÁ¤µÈ ¸¶Ä¿ »õ·Î ÂïÀ½ */
+/* ìƒˆë¡œìš´ ìœ„ì¹˜ì— ë§ˆì»¤ ì¶”ê°€. latlng = 0 ì¸ ê²½ìš°, map_marker_positions ì— ì§€ì •ëœ ë§ˆì»¤ ìƒˆë¡œ ì°ìŒ */
 function addMarker(latlng) {
 	var new_marker_obj;
-	/* ÀüÃ¼ ±¸Á¶´Â removeMarker() ¿Í µ¿ÀÏ*/
-	// ¸¶Ä¿ ÀÏ´Ü ´Ù Á¦°Å
+	/* ì „ì²´ êµ¬ì¡°ëŠ” removeMarker() ì™€ ë™ì¼*/
+	// ë§ˆì»¤ ì¼ë‹¨ ë‹¤ ì œê±°
 	if(typeof(map_markers) != "undefined") {
 		for(var i = 0; i < map_markers.length; i++)
 		{
@@ -156,14 +156,14 @@ function addMarker(latlng) {
 		var latitude = latlng.getLat();
 		var longitude = latlng.getLng();
 
-		// Áßº¹µÇ´Â ¸¶Ä¿´Â »ý¼ºµÇÁö ¾Êµµ·Ï.
+		// ì¤‘ë³µë˜ëŠ” ë§ˆì»¤ëŠ” ìƒì„±ë˜ì§€ ì•Šë„ë¡.
 		map_marker_positions = map_marker_positions.replace(latitude+','+longitude+';', '');
-		map_marker_positions += latitude + ',' + longitude + ';'; /* removeMarker() ¿Í ´Ù¸¥ °÷ */
+		map_marker_positions += latitude + ',' + longitude + ';'; /* removeMarker() ì™€ ë‹¤ë¥¸ ê³³ */
 	}
 
 	positions = makeLocationArray(map_marker_positions);
 
-	// ÀüÃ¼ ¸¶Ä¿ ´Ù½Ã »ý¼º
+	// ì „ì²´ ë§ˆì»¤ ë‹¤ì‹œ ìƒì„±
 	for(var i = 0; i < positions.length; i++)
 	{
 		map_markers[i] = new daum.maps.Marker({
@@ -174,14 +174,14 @@ function addMarker(latlng) {
 		map_markers[i].soo_position = positions[i];
 		new_marker_obj = map_markers[i];
 
-		// ÀÌº¥Æ® µî·Ï µå·¡±× ½ÃÀÛ°ú ³¡Àº ÀüÈÄ °ü°è·Î ¿¬°á µÇ¾îÀÖÀ½
+		// ì´ë²¤íŠ¸ ë“±ë¡ ë“œëž˜ê·¸ ì‹œìž‘ê³¼ ëì€ ì „í›„ ê´€ê³„ë¡œ ì—°ê²° ë˜ì–´ìžˆìŒ
 		daum.maps.event.addListener(map_markers[i], "dragstart", function() {
 			var position = this.soo_position;
 			map_marker_positions = map_marker_positions.replace(position.getLat() + ',' + position.getLng() + ';', '');
 		});
 		daum.maps.event.addListener(map_markers[i], "dragend", function() {
 			var position = this.getPosition();
-			// Áßº¹µÇ´Â ¸¶Ä¿´Â »ý¼ºµÇÁö ¾Êµµ·Ï.
+			// ì¤‘ë³µë˜ëŠ” ë§ˆì»¤ëŠ” ìƒì„±ë˜ì§€ ì•Šë„ë¡.
 			map_marker_positions = map_marker_positions.replace(position.getLat() + ',' + position.getLng() + ';', '');
 			map_marker_positions += position.getLat() + ',' + position.getLng() + ';';
 			addMarker(0);
@@ -192,13 +192,13 @@ function addMarker(latlng) {
 		});
 	}
 
-	// Ãß°¡µÈ ¸¶Ä¿°¡ ¹è¿­ÀÇ °¡Àå ¸¶Áö¸·¿¡ ÀÖÀ»°Å¶õ °¡Á¤ ÇÏ¿¡ ¸¶Áö¸· ¸¶Ä¿ ¸®ÅÏ
+	// ì¶”ê°€ëœ ë§ˆì»¤ê°€ ë°°ì—´ì˜ ê°€ìž¥ ë§ˆì§€ë§‰ì— ìžˆì„ê±°ëž€ ê°€ì • í•˜ì— ë§ˆì§€ë§‰ ë§ˆì»¤ ë¦¬í„´
 	return new_marker_obj;
 
 }
 function removeMarker(latlng) {
-/* ÀüÃ¼ ±¸Á¶´Â removeMarker() ¿Í µ¿ÀÏ*/
-	// ¸¶Ä¿ ÀÏ´Ü ´Ù Á¦°Å
+/* ì „ì²´ êµ¬ì¡°ëŠ” removeMarker() ì™€ ë™ì¼*/
+	// ë§ˆì»¤ ì¼ë‹¨ ë‹¤ ì œê±°
 	for(var i = 0; i < map_markers.length; i++)
 	{
 		map_markers[i].setMap(null);
@@ -207,11 +207,11 @@ function removeMarker(latlng) {
 	var latitude = latlng.getLat();
 	var longitude = latlng.getLng();
 
-	// ¸¶Ä¿ À§Ä¡ Á¦°Å
+	// ë§ˆì»¤ ìœ„ì¹˜ ì œê±°
 	map_marker_positions = map_marker_positions.replace(latitude+','+longitude+';', '');
 	positions = makeLocationArray(map_marker_positions);
 
-	// ÀüÃ¼ ¸¶Ä¿ ´Ù½Ã »ý¼º
+	// ì „ì²´ ë§ˆì»¤ ë‹¤ì‹œ ìƒì„±
 	for(var i = 0; i < positions.length; i++)
 	{
 		map_markers[i] = new daum.maps.Marker({
@@ -222,7 +222,7 @@ function removeMarker(latlng) {
 		map_markers[i].soo_position = positions[i];
 		new_marker_obj = map_markers[i];
 
-		// ÀÌº¥Æ® µî·Ï µå·¡±× ½ÃÀÛ°ú ³¡Àº ÀüÈÄ °ü°è·Î ¿¬°á µÇ¾îÀÖÀ½
+		// ì´ë²¤íŠ¸ ë“±ë¡ ë“œëž˜ê·¸ ì‹œìž‘ê³¼ ëì€ ì „í›„ ê´€ê³„ë¡œ ì—°ê²° ë˜ì–´ìžˆìŒ
 		daum.maps.event.addListener(map_markers[i], "dragstart", function() {
 			var position = this.soo_position;
 			map_marker_positions = map_marker_positions.replace(position.getLat() + ',' + position.getLng() + ';', '');
@@ -271,7 +271,7 @@ function insertMap(obj) {
 	if(!width) {width = '600'}
 	if(!height) {height = '400'}
 
-	//XE¿¡¼­ ¼Ó¼º »èÁ¦ÇÏ´Â ¹æÇâÀ¸·Î ¹Ù²ï´Ù¸é, alt ¿¡ ³ÖÀÚ
+	//XEì—ì„œ ì†ì„± ì‚­ì œí•˜ëŠ” ë°©í–¥ìœ¼ë¡œ ë°”ë€ë‹¤ë©´, alt ì— ë„£ìž
 	var img_var = {
 			'component': 'map_components',
 			'method': 'encode_data',
