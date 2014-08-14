@@ -1,6 +1,7 @@
 {@Context::setBrowserTitle($component_info->title);}
-<!--@if($maps_api_type == 'naver')--><!--%import("popup.js")-->
-<!--@else--><!--%import("daum_map.js")--><!--@end-->
+<!--@if($maps_api_type == 'naver')--><!--%import("naver_map.js")-->
+<!--@elseif($maps_api_type == 'daum')--><!--%import("daum_map.js")-->
+<!--@else--><!--%import("google_map.js")--><!--@end-->
 <!--%import("pop.css")-->
 <!--%import("../lang")-->
 {@Context::addHtmlHeader('<script>var no_result="'.$lang->msg_no_result.'";'.
@@ -28,9 +29,6 @@
 		</div>
 	</div>
 	<div id="map_canvas"></div>
-	<input type="hidden" id="lat" value="" />
-	<input type="hidden" id="lng" value="" />
-	<input type="hidden" id="map_zoom" value="" />
 	<input type="hidden" id="width" value="" />
 	<input type="hidden" id="height" value="" />
 </div>

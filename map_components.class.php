@@ -69,6 +69,19 @@ class map_components extends EditorHandler {
 		if(!$data) return;
 		$data = unserialize(base64_decode($data));
 
+		$style = trim(Context::get('style')).';';
+		preg_match('/width([ ]*)\:([0-9 a-z\.]+)\;/i', $style, $width_style);
+		preg_match('/height([ ]*)\:([0-9 a-z\.]+)\;/i', $style, $height_style);
+		if($width_style[2]) $width = intval(trim($width_style[2]));
+		if(!$width) $width = intval($xml_obj->attrs->width);
+		if(!$width) {$width = 600;}
+
+		if($height_style[2]) $height = intval(trim($height_style[2]));
+		if(!$height) $height = intval($xml_obj->attrs->height);
+		if(!$height) {$height = 400;}
+
+		$this->add("width", $width);
+		$this->add("height", $height);
 		$this->add("results", $data);
 	}
 
@@ -108,7 +121,7 @@ class map_components extends EditorHandler {
 
 		}
 
-		if($this->soo_naver_map_api_key) {
+		/*if($this->soo_naver_map_api_key) {
 			$uri = sprintf('http://map.naver.com/api/geocode.php?key=%s&encoding=utf-8&coord=latlng&query=%s',$this->soo_naver_map_api_key,urlencode($address));
 			$xml_doc = $this->xml_api_request($uri);
 
@@ -130,7 +143,7 @@ class map_components extends EditorHandler {
 				}
 
 			}
-		}
+		}*/
 
 		if($this->soo_daum_local_api_key) {
 			$uri = sprintf('http://apis.daum.net/local/geo/addr2coord?apikey=%s&q=%s&output=xml',$this->soo_daum_local_api_key,urlencode($address));
@@ -161,21 +174,62 @@ class map_components extends EditorHandler {
 	function getPopupContent() {
 		// 템플릿을 미리 컴파일해서 컴파일된 소스를 return. Compile the popup contents and return it.
 		$tpl_path = $this->component_path.'tpl';
+		$tpl_file = 'popup_maps.html';
+
+		// API 종류 정하기 다음/네이버/구글
 		if(trim($this->soo_map_api))
 		{
 			if(strlen($this->soo_map_api) == 40)
 			{
 				$this->maps_api_type = 'daum';
 			}
-			elseif(strlen($this->soo_map_api) == 32)
+			/*elseif(strlen($this->soo_map_api) == 32)
 			{
 				$this->maps_api_type = 'naver';
+			}*/
+			else
+			{
+				$this->maps_api_type = 'google';
 			}
 		}
-		if(!$this->maps_api_type)
-		{
-			$tpl_file = 'popup.html';
 
+		// 다음과 네이버는 국내 지도만 사용가능. 구글은 세계지도.
+		if($this->maps_api_type == 'daum')
+		{
+			$this->map_comp_lat = 37.57;
+			$this->map_comp_lng = 126.98;
+
+			$map_comp_header_script = '<script src="https://apis.daum.net/maps/maps3.js?apikey='.$this->soo_map_api.'"></script>';
+			$map_comp_header_script .= '<script>'.
+				sprintf(
+					'var defaultlat="%s";'.
+					'var defaultlng="%s";'
+					,$this->map_comp_lat,$this->map_comp_lng).
+				'</script>';
+			Context::set('soo_langcode', 'ko');
+			Context::set('maps_api_type', $this->maps_api_type);
+			Context::set('tpl_path', $tpl_path);
+			Context::addHtmlHeader($map_comp_header_script);
+		}
+		/*elseif($this->maps_api_type == 'naver')
+		{
+			$this->map_comp_lat = 37.57;
+			$this->map_comp_lng = 126.98;
+
+			$map_comp_header_script = '<script src="https://apis.daum.net/maps/maps3.js?apikey='.$this->soo_map_api.'"></script>';
+			$map_comp_header_script .= '<script>'.
+				sprintf(
+					'var defaultlat="%s";'.
+					'var defaultlng="%s";'
+					,$this->map_comp_lat,$this->map_comp_lng).
+				'</script>';
+			Context::set('soo_langcode', 'ko');
+			Context::set('maps_api_type', $this->maps_api_type);
+			Context::set('tpl_path', $tpl_path);
+			Context::addHtmlHeader($map_comp_header_script);
+		}*/
+		else
+		{
 			if(Context::getLangType() == 'ko') // Seoul
 			{
 				$this->map_comp_lat = 37.57;
@@ -203,25 +257,6 @@ class map_components extends EditorHandler {
 			Context::set('tpl_path', $tpl_path);
 			Context::addHtmlHeader($map_comp_header_script);
 		}
-		else
-		{
-			$tpl_file = 'kr_map.html';
-
-			$this->map_comp_lat = 37.57;
-			$this->map_comp_lng = 126.98;
-
-			$map_comp_header_script = '<script src="https://apis.daum.net/maps/maps3.js?apikey='.$this->soo_map_api.'"></script>';
-			$map_comp_header_script .= '<script>'.
-				sprintf(
-					'var defaultlat="%s";'.
-					'var defaultlng="%s";'
-					,$this->map_comp_lat,$this->map_comp_lng).
-				'</script>';
-			Context::set('soo_langcode', 'ko');
-			Context::set('maps_api_type', $this->maps_api_type);
-			Context::set('tpl_path', $tpl_path);
-			Context::addHtmlHeader($map_comp_header_script);
-		}
 		$oTemplate = &TemplateHandler::getInstance();
 		return $oTemplate->compile($tpl_path, $tpl_file);
 	}
@@ -234,15 +269,20 @@ class map_components extends EditorHandler {
 	 * DocumentModule::transContent() would call the transHTML() method.
 	 **/
 	function transHTML($xml_obj) {
+		// API 종류 정하기 다음/네이버/구글
 		if(trim($this->soo_map_api))
 		{
 			if(strlen($this->soo_map_api) == 40)
 			{
 				$this->maps_api_type = 'daum';
 			}
-			elseif(strlen($this->soo_map_api) == 32)
+			/*elseif(strlen($this->soo_map_api) == 32)
 			{
 				$this->maps_api_type = 'naver';
+			}*/
+			else
+			{
+				$this->maps_api_type = 'google';
 			}
 		}
 
@@ -268,7 +308,7 @@ class map_components extends EditorHandler {
 		if(!$height) $height = intval($xml_obj->attrs->height);
 		if(!$height) {$height = 400;}
 
-		$header_script = '<style>.gmnoprint div[title^="Pan"],.gmnoprint div[title~="이동"] {opacity: 0 !important;}</style>';
+		$header_script = '';
 		if($map_count==1) {
 			if($this->maps_api_type == 'daum')
 			{
@@ -276,7 +316,7 @@ class map_components extends EditorHandler {
 			}
 			else
 			{
-				$header_script .= '<script src="https://maps-api-ssl.google.com/maps/api/js?sensor=false&amp;language='.$this->langtype.'"></script><style type="text/css">span.soo_maps {display:block;} span.soo_maps img {max-width:none;}span.soo_maps>a>img {max-width:100%;}</style>'."\n";
+				$header_script .= '<script src="https://maps-api-ssl.google.com/maps/api/js?sensor=false&amp;language='.$this->langtype.'"></script><style type="text/css">.gmnoprint div[title^="Pan"],.gmnoprint div[title~="이동"] {opacity: 0 !important;}span.soo_maps {display:block;} span.soo_maps img {max-width:none;}span.soo_maps>a>img {max-width:100%;}</style>'."\n";
 			}
 			
 		}
@@ -287,14 +327,10 @@ class map_components extends EditorHandler {
 			$lng = $map_center[1];;
 			settype($lng,"float");
 
-			$map_markers = explode(',', trim($data->map_markers));
-			
-			$marker_lat = $map_markers[0];
-			settype($marker_lat,"float");
-			$marker_lng = $map_markers[1];
-			settype($marker_lng,"float");
-			$zoom = trim($data->map_zoom);
-			settype($zoom,"int");
+			$map_markers = trim($data->map_markers);
+			$map_markers = preg_replace('/[^0-9\.\,\;]+/i', '', $map_markers);
+
+			$zoom = intval(trim($data->map_zoom));
 
 			$map_locations = array();
 			$map_locations[0] = array(
@@ -308,81 +344,31 @@ class map_components extends EditorHandler {
 			if($this->maps_api_type == 'daum')
 			{
 				$zoom = intval(20-$zoom);
+				Context::loadFile(array('./modules/editor/components/map_components/front/js/daum_maps.js', 'head', '', null), true);
 				$header_script .= '<script>'.
 					'function ggl_map_init'.$map_count.'() {'.
 						'var mapOption = { level: '.$zoom.', center: new daum.maps.LatLng('.$lat.', '.$lng.') };'.
+						'var marker_points = "'.$map_markers.'";'.
 						'var ggl_map'.$map_count.' = new daum.maps.Map(document.getElementById("ggl_map_canvas'.$map_count.'"), mapOption);'.
 						'var zoomControl = new daum.maps.ZoomControl();'.
 						'ggl_map'.$map_count.'.addControl(zoomControl, daum.maps.ControlPosition.LEFT);'.
 						'var mapTypeControl = new daum.maps.MapTypeControl();'.
 						'ggl_map'.$map_count.'.addControl(mapTypeControl, daum.maps.ControlPosition.TOPRIGHT);'.
-						'var ggl_marker'.$map_count.' = new daum.maps.Marker({ position: new daum.maps.LatLng('.$marker_lat.', '.$marker_lng.') });'.
-						'ggl_marker'.$map_count.'.setMap(ggl_map'.$map_count.');'.
-						'ggl_marker'.$map_count.'.setDraggable(false);'.'}</script>';
+						'addMarker(ggl_map'.$map_count.',marker_points)}</script>';
 			}
 			else
 			{
+				Context::loadFile(array('./modules/editor/components/map_components/front/js/google_maps.js', 'head', '', null), true);
 				$header_script .= '<script>'.
 					'function ggl_map_init'.$map_count.'() {'.
-						'var mapOption = { zoom: '.$zoom.', mapTypeId: google.maps.MapTypeId.ROADMAP };'.
+						'var mapOption = { zoom: '.$zoom.', mapTypeId: google.maps.MapTypeId.ROADMAP, center: new google.maps.LatLng('.$lat.', '.$lng.'), mapTypeControl: true, mapTypeControlOptions: { style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR, position: google.maps.ControlPosition.TOP_RIGHT }, panControl: false, zoomControl: true, zoomControlOptions: { style: google.maps.ZoomControlStyle.LARGE, position: google.maps.ControlPosition.LEFT_CENTER }, scaleControl: false, streetViewControl: false};'.
+						'var marker_points = "'.$map_markers.'";'.
 						'var ggl_map'.$map_count.' = new google.maps.Map(document.getElementById("ggl_map_canvas'.$map_count.'"), mapOption);'.
-						'ggl_map'.$map_count.'.setCenter(new google.maps.LatLng('.$lat.', '.$lng.'));'.
-						'var ggl_markerlatlng'.$map_count.' = new google.maps.LatLng('.$marker_lat.', '.$marker_lng.');'.
-						'var ggl_marker'.$map_count.' = new google.maps.Marker({ position: ggl_markerlatlng'.$map_count.', map: ggl_map'.$map_count.', draggable: false});'.
-						'ggl_marker'.$map_count.'.setMap(ggl_map'.$map_count.');'.'}</script>';
+						'addMarker(ggl_map'.$map_count.',marker_points)}</script>';
 			}
 
 			Context::addHtmlHeader($header_script);
-		} else { // 다중 위치 지도 map of numerous point
-			settype($data->location_no,"int");
-			$map_locations = array();
-
-			$header_script .= '<script>'.
-				'function ggl_map_init'.$map_count.'() {'.
-					'var mapOption = { zoom:8,mapTypeControl: '.$maptypeCtrl.', mapTypeId: google.maps.MapTypeId.ROADMAP };'.
-					'var infowindow = new google.maps.InfoWindow({content: ""}); var ggl_map'.$map_count.' = new google.maps.Map(document.getElementById("ggl_map_canvas'.$map_count.'"), mapOption);'."\n";
-				for($i=0;$i<$data->location_no;$i++) {
-					$lat = trim($data->{'map_lat'.$i});
-					settype($lat,"float");
-					$lng = trim($data->{'map_lng'.$i});
-					settype($lng,"float");
-					$marker_lng = trim($data->{'marker_lng'.$i});
-					settype($marker_lng,"float");
-					$marker_lat = trim($data->{'marker_lat'.$i});
-					settype($marker_lat,"float");
-					$zoom = trim($data->{'map_zoom'.$i});
-					settype($zoom,"int");
-					if(!$lat || !$lng || !$marker_lng || !$marker_lat || !$zoom) {
-						return 'f';
-						break;
-					}
-
-
-					//getMobileMaps() 이용할것.
-					$map_locations[] = array(
-						'map_lat' => $lat,
-						'map_lng' => $lng,
-						'marker_lng' => $marker_lng,
-						'marker_lat' => $marker_lat,
-						'map_zoom' => $zoom
-					);
-
-					if($i==0) {
-						$header_script .= 'ggl_map'.$map_count.'.setCenter(new google.maps.LatLng('.$lat.', '.$lng.'));'.'ggl_map'.$map_count.'.setZoom('.$zoom.');'."\n";
-					}
-					$header_script .= 'var ggl_markerlatlng'.$map_count.'_'.$i.' = new google.maps.LatLng('.$marker_lat.', '.$marker_lng.');'.
-						'var ggl_marker'.$map_count.'_'.$i.' = new google.maps.Marker({ position: ggl_markerlatlng'.$map_count.'_'.$i.', map: ggl_map'.$map_count.', draggable: false});'.
-						'ggl_marker'.$map_count.'_'.$i.'.setMap(ggl_map'.$map_count.');'."\n";
-
-					$header_script .= 'google.maps.event.addListener(ggl_marker'.$map_count.'_'.$i.', \'click\', function(){'.
-						'ggl_map'.$map_count.'.setZoom('.$zoom.');'.
-						'ggl_map'.$map_count.'.panTo(new google.maps.LatLng('.$lat.', '.$lng.'));'.
-						'infowindow.close();'."\n";
-					$header_script .=  '});'.'ggl_marker'.$map_count.'_'.$i.'.setMap(ggl_map'.$map_count.');'."\n";
-				}
-
-				$header_script .= '}</script>';
-			Context::addHtmlHeader($header_script);
+		} else {
 		}
 
 		if(Context::getResponseMethod() != 'HTML') {

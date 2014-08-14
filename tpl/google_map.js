@@ -1,26 +1,26 @@
 /* Map Component by MinSoo Kim. (c) 2014 MinSoo Kim. (misol.kr@gmail.com) */
-var map_zoom = 5, map_lat = '', map_lng = '', map = '', marker = '', map_markers = new Array(), map_marker_positions = '', modi_marker_pos = '', saved_location = new Array(), result_array = new Array(), result_from = '';
+var map_zoom = 13, map_lat = '', map_lng = '', map = '', marker = '', map_markers = new Array(), map_marker_positions = '', modi_marker_pos = '', saved_location = new Array(), result_array = new Array(), result_from = '';
 /*
 
 ** 2014 08 11 TODO LIST **
 
-map_marker_positions ´Â lat,lng;lat,lng; Çü½ÄÀ¸·Î ¸¶Ä¿µéÀÇ À§Ä¡¸¦ ¸ğµÎ Æ÷ÇÔÇÏ´Â ÄÁÅ×ÀÌ³Ê.
-- Áöµµ Ã³À½ ·Îµù½Ã ¸¶Ä¿ ÇÏ³ªµµ ¾øÀ½
-- ¸¶Ä¿°¡ Ãß°¡µÉ ¶§ À§Ä¡ Ãß°¡
-- ¸¶Ä¿°¡ Á¦°ÅµÉ ¶§ À§Ä¡ Á¦°Å
-- ¸¶Ä¿ ÀÌµ¿Àº Á¦°Å ÈÄ Ãß°¡·Î °£ÁÖ.
-- °Ë»ö °á°ú¿¡¼­ °á°ú Ç×¸ñÀ» Å¬¸¯ÇÏ´Â °ÍÀº Áöµµ À§Ä¡¸¸ ÀÌµ¿.
+map_marker_positions ëŠ” lat,lng;lat,lng; í˜•ì‹ìœ¼ë¡œ ë§ˆì»¤ë“¤ì˜ ìœ„ì¹˜ë¥¼ ëª¨ë‘ í¬í•¨í•˜ëŠ” ì»¨í…Œì´ë„ˆ.
+- ì§€ë„ ì²˜ìŒ ë¡œë”©ì‹œ ë§ˆì»¤ í•˜ë‚˜ë„ ì—†ìŒ
+- ë§ˆì»¤ê°€ ì¶”ê°€ë  ë•Œ ìœ„ì¹˜ ì¶”ê°€
+- ë§ˆì»¤ê°€ ì œê±°ë  ë•Œ ìœ„ì¹˜ ì œê±°
+- ë§ˆì»¤ ì´ë™ì€ ì œê±° í›„ ì¶”ê°€ë¡œ ê°„ì£¼.
+- ê²€ìƒ‰ ê²°ê³¼ì—ì„œ ê²°ê³¼ í•­ëª©ì„ í´ë¦­í•˜ëŠ” ê²ƒì€ ì§€ë„ ìœ„ì¹˜ë§Œ ì´ë™.
 
 
-¸¶Ä¿¸¦ ¿òÁ÷ÀÌ¸é, Ã³À½ ¸¶Ä¿ À§Ä¡¸¦ map_marker_positions ¿¡¼­ Ã£¾Æ¼­, ¿òÁ÷ÀÓÀÌ ³¡³­ °÷ÀÇ À§Ä¡·Î Ä¡È¯.
-¸¶Ä¿¸¦ ´õºíÅ¬¸¯ÇÏ¸é map_marker_positions ¿¡¼­ Ã£¾Æ¼­ ¸¶Ä¿¸¦ »èÁ¦ÇÏ°í, ¸Ê¿¡¼­µµ ¸¶Ä¿ »èÁ¦
-Áöµµ¸¦ ´õºíÅ¬¸¯ÇÏ¸é ´õºíÅ¬¸¯ÇÑ À§Ä¡¿¡ ¸¶Ä¿ »ı¼ºÇÏ°í map_marker_positions ¿¡¼­ ¸¶Ä¿ Ãß°¡.
+ë§ˆì»¤ë¥¼ ì›€ì§ì´ë©´, ì²˜ìŒ ë§ˆì»¤ ìœ„ì¹˜ë¥¼ map_marker_positions ì—ì„œ ì°¾ì•„ì„œ, ì›€ì§ì„ì´ ëë‚œ ê³³ì˜ ìœ„ì¹˜ë¡œ ì¹˜í™˜.
+ë§ˆì»¤ë¥¼ ë”ë¸”í´ë¦­í•˜ë©´ map_marker_positions ì—ì„œ ì°¾ì•„ì„œ ë§ˆì»¤ë¥¼ ì‚­ì œí•˜ê³ , ë§µì—ì„œë„ ë§ˆì»¤ ì‚­ì œ
+ì§€ë„ë¥¼ ë”ë¸”í´ë¦­í•˜ë©´ ë”ë¸”í´ë¦­í•œ ìœ„ì¹˜ì— ë§ˆì»¤ ìƒì„±í•˜ê³  map_marker_positions ì—ì„œ ë§ˆì»¤ ì¶”ê°€.
 */
-function map_point(i) { //°Ë»öµÈ À§Ä¡ Á¤º¸¸¦ ¹è¿­¿¡¼­ ·Îµå
+function map_point(i) { //ê²€ìƒ‰ëœ ìœ„ì¹˜ ì •ë³´ë¥¼ ë°°ì—´ì—ì„œ ë¡œë“œ
 	center = result_array[i].geometry.location;
 	map.setCenter(center);
 }
-function view_list() { //°Ë»öµÈ À§Ä¡ Á¤º¸¸¦ ¹è¿­¿¡¼­ ¸®½ºÆ®·Î »Ñ¸²
+function view_list() { //ê²€ìƒ‰ëœ ìœ„ì¹˜ ì •ë³´ë¥¼ ë°°ì—´ì—ì„œ ë¦¬ìŠ¤íŠ¸ë¡œ ë¿Œë¦¼
 	var html = '';
 	if(result_array.length == 0) 
 	{
@@ -69,7 +69,7 @@ function address_adder(results) {
 		if(results[i].formatted_address || results[i].formatted_address != null) {
 			result_array[i] = { from: results[i].result_from,
 				formatted_address: results[i].formatted_address,
-				geometry: {location : new daum.maps.LatLng(results[i].geometry.lat, results[i].geometry.lng) } };
+				geometry: {location : new google.maps.LatLng(results[i].geometry.lat, results[i].geometry.lng) } };
 		}
 	}
 	view_list();
@@ -77,10 +77,25 @@ function address_adder(results) {
 
 function getMaps() {
 	var mapOption = {
-		level: map_zoom,
-		center: new daum.maps.LatLng(defaultlat, defaultlng)
+		zoom: map_zoom,
+		center: new google.maps.LatLng(defaultlat, defaultlng),
+		mapTypeId: google.maps.MapTypeId.ROADMAP,
+		mapTypeControl: true,
+		mapTypeControlOptions: {
+			style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+			position: google.maps.ControlPosition.TOP_RIGHT
+		},
+		panControl: false,
+		zoomControl: true,
+		zoomControlOptions: {
+			style: google.maps.ZoomControlStyle.LARGE,
+			position: google.maps.ControlPosition.LEFT_CENTER
+		},
+		scaleControl: false,
+		streetViewControl: false,
+		disableDoubleClickZoom: true
 	}
-	map = new daum.maps.Map(document.getElementById("map_canvas"), mapOption);
+	map = new google.maps.Map(document.getElementById("map_canvas"), mapOption);
 
 	if(typeof(opener) !="undefined" && opener != null)
 	{
@@ -104,69 +119,62 @@ function getMaps() {
 				img_data = ret_obj['results'];
 
 				var center_split = img_data['map_center'].split(',');
-				center = new daum.maps.LatLng(center_split[0], center_split[1]);
+				center = new google.maps.LatLng(center_split[0], center_split[1]);
 				map.setCenter(center);
 
-				map_lat = center.getLng();
-				map_lng = center.getLat();
+				map_lat = center.lng();
+				map_lng = center.lat();
 
 				var markers_split = img_data['map_markers'].split(';');
 				map_marker_positions = img_data['map_markers'].trim();
 				marker = addMarker(0);
 
-				map_zoom = 20 - parseInt(img_data['map_zoom'],10);
-				if(!map_zoom) map_zoom = 5;
-				map.setLevel(map_zoom);
+				map_zoom = parseInt(img_data['map_zoom'],10);
+				if(!map_zoom) map_zoom = 13;
+				map.setZoom(map_zoom);
 			}, response_tags);
 	} else {
-		center = new daum.maps.LatLng(defaultlat, defaultlng);
+		center = new google.maps.LatLng(defaultlat, defaultlng);
 		map.setCenter(center);
 		var center = map.getCenter();
 
 		jQuery("#width").val('600');
 		jQuery("#height").val('400');
-		map.setLevel(map_zoom);
+		map.setZoom(map_zoom);
 	}
 
-	var zoomControl = new daum.maps.ZoomControl();
-	map.addControl(zoomControl, daum.maps.ControlPosition.LEFT);
-	var mapTypeControl = new daum.maps.MapTypeControl();
-	map.addControl(mapTypeControl, daum.maps.ControlPosition.TOPRIGHT);
-
-	daum.maps.event.addListener(map, 'dblclick', function(MouseEvent) {
+	google.maps.event.addListener(map, 'dblclick', function(MouseEvent) {
 		latlng = MouseEvent.latLng;
 		addMarker(latlng);
 	});
 
 }
 
-/* »õ·Î¿î À§Ä¡¿¡ ¸¶Ä¿ Ãß°¡. latlng = 0 ÀÎ °æ¿ì, map_marker_positions ¿¡ ÁöÁ¤µÈ ¸¶Ä¿ »õ·Î ÂïÀ½ */
+/* ìƒˆë¡œìš´ ìœ„ì¹˜ì— ë§ˆì»¤ ì¶”ê°€. latlng = 0 ì¸ ê²½ìš°, map_marker_positions ì— ì§€ì •ëœ ë§ˆì»¤ ìƒˆë¡œ ì°ìŒ */
 function addMarker(latlng) {
 	var new_marker_obj;
-	/* ÀüÃ¼ ±¸Á¶´Â removeMarker() ¿Í µ¿ÀÏ*/
-	// ¸¶Ä¿ ÀÏ´Ü ´Ù Á¦°Å
+	/* ì „ì²´ êµ¬ì¡°ëŠ” removeMarker() ì™€ ë™ì¼*/
+	// ë§ˆì»¤ ì¼ë‹¨ ë‹¤ ì œê±°
 	if(typeof(map_markers) != "undefined") {
 		for(var i = 0; i < map_markers.length; i++)
 		{
 			map_markers[i].setMap(null);
 		}
 	}
+	map_markers = new Array();
 
 	if(latlng != 0) {
-		var latitude = latlng.getLat();
-		var longitude = latlng.getLng();
-
-		// Áßº¹µÇ´Â ¸¶Ä¿´Â »ı¼ºµÇÁö ¾Êµµ·Ï.
-		map_marker_positions = map_marker_positions.replace(latitude+','+longitude+';', '');
-		map_marker_positions += latitude + ',' + longitude + ';'; /* removeMarker() ¿Í ´Ù¸¥ °÷ */
+		// ì¤‘ë³µë˜ëŠ” ë§ˆì»¤ëŠ” ìƒì„±ë˜ì§€ ì•Šë„ë¡.
+		map_marker_positions = positionstrRemover(latlng, map_marker_positions);
+		map_marker_positions += latlng.lat() + ',' + latlng.lng() + ';'; /* removeMarker() ì™€ ë‹¤ë¥¸ ê³³ */
 	}
 
 	positions = makeLocationArray(map_marker_positions);
 
-	// ÀüÃ¼ ¸¶Ä¿ ´Ù½Ã »ı¼º
+	// ì „ì²´ ë§ˆì»¤ ë‹¤ì‹œ ìƒì„±
 	for(var i = 0; i < positions.length; i++)
 	{
-		map_markers[i] = new daum.maps.Marker({
+		map_markers[i] = new google.maps.Marker({
 			position: positions[i]
 		});
 		map_markers[i].setMap(map);
@@ -174,47 +182,44 @@ function addMarker(latlng) {
 		map_markers[i].soo_position = positions[i];
 		new_marker_obj = map_markers[i];
 
-		// ÀÌº¥Æ® µî·Ï µå·¡±× ½ÃÀÛ°ú ³¡Àº ÀüÈÄ °ü°è·Î ¿¬°á µÇ¾îÀÖÀ½
-		daum.maps.event.addListener(map_markers[i], "dragstart", function() {
+		// ì´ë²¤íŠ¸ ë“±ë¡ ë“œë˜ê·¸ ì‹œì‘ê³¼ ëì€ ì „í›„ ê´€ê³„ë¡œ ì—°ê²° ë˜ì–´ìˆìŒ
+		google.maps.event.addListener(map_markers[i], "dragstart", function() {
 			var position = this.soo_position;
-			map_marker_positions = map_marker_positions.replace(position.getLat() + ',' + position.getLng() + ';', '');
+			map_marker_positions = positionstrRemover(position, map_marker_positions);
 		});
-		daum.maps.event.addListener(map_markers[i], "dragend", function() {
+		google.maps.event.addListener(map_markers[i], "dragend", function() {
 			var position = this.getPosition();
-			// Áßº¹µÇ´Â ¸¶Ä¿´Â »ı¼ºµÇÁö ¾Êµµ·Ï.
-			map_marker_positions = map_marker_positions.replace(position.getLat() + ',' + position.getLng() + ';', '');
-			map_marker_positions += position.getLat() + ',' + position.getLng() + ';';
+			map_marker_positions = positionstrRemover(position, map_marker_positions);
+			map_marker_positions += position.lat() + ',' + position.lng() + ';';
 			addMarker(0);
 		});
-		daum.maps.event.addListener(map_markers[i], "rightclick", function() {
+		google.maps.event.addListener(map_markers[i], "rightclick", function() {
 			var position = this.soo_position;
 			removeMarker(position);
 		});
 	}
 
-	// Ãß°¡µÈ ¸¶Ä¿°¡ ¹è¿­ÀÇ °¡Àå ¸¶Áö¸·¿¡ ÀÖÀ»°Å¶õ °¡Á¤ ÇÏ¿¡ ¸¶Áö¸· ¸¶Ä¿ ¸®ÅÏ
+	// ì¶”ê°€ëœ ë§ˆì»¤ê°€ ë°°ì—´ì˜ ê°€ì¥ ë§ˆì§€ë§‰ì— ìˆì„ê±°ë€ ê°€ì • í•˜ì— ë§ˆì§€ë§‰ ë§ˆì»¤ ë¦¬í„´
 	return new_marker_obj;
 
 }
 function removeMarker(latlng) {
-/* ÀüÃ¼ ±¸Á¶´Â removeMarker() ¿Í µ¿ÀÏ*/
-	// ¸¶Ä¿ ÀÏ´Ü ´Ù Á¦°Å
+/* ì „ì²´ êµ¬ì¡°ëŠ” removeMarker() ì™€ ë™ì¼*/
+	// ë§ˆì»¤ ì¼ë‹¨ ë‹¤ ì œê±°
 	for(var i = 0; i < map_markers.length; i++)
 	{
 		map_markers[i].setMap(null);
 	}
+	map_markers = new Array();
 
-	var latitude = latlng.getLat();
-	var longitude = latlng.getLng();
-
-	// ¸¶Ä¿ À§Ä¡ Á¦°Å
-	map_marker_positions = map_marker_positions.replace(latitude+','+longitude+';', '');
+	// ë§ˆì»¤ ìœ„ì¹˜ ì œê±°
+	map_marker_positions = positionstrRemover(latlng, map_marker_positions);
 	positions = makeLocationArray(map_marker_positions);
 
-	// ÀüÃ¼ ¸¶Ä¿ ´Ù½Ã »ı¼º
+	// ì „ì²´ ë§ˆì»¤ ë‹¤ì‹œ ìƒì„±
 	for(var i = 0; i < positions.length; i++)
 	{
-		map_markers[i] = new daum.maps.Marker({
+		map_markers[i] = new google.maps.Marker({
 			position: positions[i]
 		});
 		map_markers[i].setMap(map);
@@ -222,23 +227,39 @@ function removeMarker(latlng) {
 		map_markers[i].soo_position = positions[i];
 		new_marker_obj = map_markers[i];
 
-		// ÀÌº¥Æ® µî·Ï µå·¡±× ½ÃÀÛ°ú ³¡Àº ÀüÈÄ °ü°è·Î ¿¬°á µÇ¾îÀÖÀ½
-		daum.maps.event.addListener(map_markers[i], "dragstart", function() {
+		// ì´ë²¤íŠ¸ ë“±ë¡ ë“œë˜ê·¸ ì‹œì‘ê³¼ ëì€ ì „í›„ ê´€ê³„ë¡œ ì—°ê²° ë˜ì–´ìˆìŒ
+		google.maps.event.addListener(map_markers[i], "dragstart", function() {
 			var position = this.soo_position;
-			map_marker_positions = map_marker_positions.replace(position.getLat() + ',' + position.getLng() + ';', '');
+			map_marker_positions = positionstrRemover(position, map_marker_positions);
 		});
-		daum.maps.event.addListener(map_markers[i], "dragend", function() {
+		google.maps.event.addListener(map_markers[i], "dragend", function() {
 			var position = this.getPosition();
-			map_marker_positions = map_marker_positions.replace(position.getLat() + ',' + position.getLng() + ';', '');
-			map_marker_positions += position.getLat() + ',' + position.getLng() + ';';
+			map_marker_positions = positionstrRemover(position, map_marker_positions);
+			map_marker_positions += position.lat() + ',' + position.lng() + ';';
 			addMarker(0);
 		});
-		daum.maps.event.addListener(map_markers[i], "rightclick", function() {
+		google.maps.event.addListener(map_markers[i], "rightclick", function() {
 			var position = this.soo_position;
 			removeMarker(position);
 		});
 	}
 
+}
+
+function positionstrRemover(obj_position, str_positions) {
+	var remove_point = '';
+	var arr_positions = str_positions.split(";");
+	for(var i = 0; i < arr_positions.length; i++)
+	{
+		if(!arr_positions[i].trim()) continue;
+		var position = arr_positions[i].split(",");
+		var obj_base_position = new google.maps.LatLng(position[0],position[1]);
+		if(obj_base_position.equals(obj_position))
+		{
+			str_positions = str_positions.replace(arr_positions[i] + ';', '');
+		}
+	}
+	return str_positions;
 }
 
 function makeLocationArray(str_position) {
@@ -248,7 +269,7 @@ function makeLocationArray(str_position) {
 	{
 		if(!positions[i].trim()) continue;
 		var position = positions[i].split(",");
-		arr_positons[i] = new daum.maps.LatLng(position[0],position[1]);
+		arr_positons[i] = new google.maps.LatLng(position[0],position[1]);
 	}
 	return arr_positons;
 }
@@ -257,7 +278,7 @@ function makeLocationStr(arr_position) {
 
 	for(var i = 0; i < arr_position.length; i++)
 	{
-		str_positons += arr_position[i].getLat() + ',' + arr_position[i].getLng() + ';';
+		str_positons += arr_position[i].lat() + ',' + arr_position[i].lng() + ';';
 	}
 	return str_positons;
 }
@@ -265,13 +286,13 @@ function insertMap(obj) {
 	if(typeof(opener)=="undefined" || !opener) return;
 	var width = jQuery("#width").val(), height = jQuery("#height").val();
 
-	map_zoom = 20 - map.getLevel();
-	map_lat = map.getCenter().getLat();
-	map_lng = map.getCenter().getLng();
+	map_zoom = map.getZoom();
+	map_lat = map.getCenter().lat();
+	map_lng = map.getCenter().lng();
 	if(!width) {width = '600'}
 	if(!height) {height = '400'}
 
-	//XE¿¡¼­ ¼Ó¼º »èÁ¦ÇÏ´Â ¹æÇâÀ¸·Î ¹Ù²ï´Ù¸é, alt ¿¡ ³ÖÀÚ
+	//XEì—ì„œ ì†ì„± ì‚­ì œí•˜ëŠ” ë°©í–¥ìœ¼ë¡œ ë°”ë€ë‹¤ë©´, alt ì— ë„£ì
 	var img_var = {
 			'component': 'map_components',
 			'method': 'encode_data',
