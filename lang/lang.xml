@@ -12,6 +12,10 @@
 		<value xml:lang="ko">이 지점에 마커가 생성됩니다.</value>
 		<value xml:lang="en">A marker will be here.</value>
 	</item>
+	<item name="soo_about_marker">
+		<value xml:lang="ko">지도를 더블클릭하면 마커가 추가됩니다.</value>
+		<value xml:lang="en">Another marker with another double-click.</value>
+	</item>
 	<item name="about_soo_result_use">
 		<value xml:lang="ko"><![CDATA[검색을 이용하지 않고 <strong>드래그 만으로도</strong> 위치 설정이 가능합니다.<br />검색창에 찾을 지역명을 검색 하시면, 이곳에 검색 결과가 나타납니다. 검색 결과가 1개 일 경우 바로 이동하며, 2개 이상일 경우는 선택해 주셔야 합니다.]]></value>
 		<value xml:lang="en"><![CDATA[You can select the place by dragging maps or dragging marker.<br />You can use searching box to find out the location. The result would be shown up here.]]></value>
