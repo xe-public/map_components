@@ -16,6 +16,13 @@ map_marker_positions 는 lat,lng;lat,lng; 형식으로 마커들의 위치를 �
 마커를 더블클릭하면 map_marker_positions 에서 찾아서 마커를 삭제하고, 맵에서도 마커 삭제
 지도를 더블클릭하면 더블클릭한 위치에 마커 생성하고 map_marker_positions 에서 마커 추가.
 */
+function toggle(id)
+{
+	obj=document.getElementById(id);
+
+	if(obj.style.display == "none") obj.style.display="block";
+	else obj.style.display="none";
+}
 function map_point(i) { //검색된 위치 정보를 배열에서 로드
 	center = result_array[i].geometry.location;
 	map.setCenter(center);

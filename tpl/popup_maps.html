@@ -9,7 +9,7 @@
 	'var soo_about_marker="'.$lang->soo_about_marker.'";'.
 	'var soo_langcode="'.$soo_langcode.'";</script>');}
 <div id="bodyDiv">
-	<h1 id="title"><a href="#" onclick="winopen('./?module=editor&amp;act=dispEditorComponentInfo&amp;component_name={$component_info->component_name}','ComponentInfo','left=10,top=10,width=10,height=10,resizable=no,scrollbars=no,toolbars=no');return false;">{$component_info->title}</a></h1>
+	<h1 id="title"><a href="#" onclick="toggle('helpDiv');return false;">{$component_info->title}</a></h1>
 	<div id="controlArea">
 		<div id="searchArea">
 			<ul>
@@ -31,4 +31,11 @@
 	<div id="map_canvas"></div>
 	<input type="hidden" id="width" value="" />
 	<input type="hidden" id="height" value="" />
+	<div id="helpDiv" style="display:none;">
+		<a href="#" onclick="toggle('helpDiv');return false;">
+		<!--@if(Context::getLangType() == 'ko')--><img src="./modules/editor/components/map_components/tpl/image/help1.ko.png" alt="지도 컴포넌트 도움말 그림. 왼쪽에는 검색 영역이 있고, 오른쪽에는 지도 영역이 있습니다. 오른쪽 지도 영역에서 표시하고 싶은 위치를 클릭해보세요. 표시를 지우고 싶은 영역은 나타난 표시를 다시 클릭해보세요." />
+		<!--@else--><img src="./modules/editor/components/map_components/tpl/image/help1.en.png" alt="Maps component help. Search area on the left, and Map area on the right. Click the map to note a place or reclick to remove a mark." />
+		<!--@end-->
+		</a>
+	</div>
 </div>

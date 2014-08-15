@@ -101,6 +101,23 @@ class map_components extends EditorHandler {
 		$address = Context::get('address');
 		if(!$address) return;
 
+		// API 종류 정하기 다음/네이버/구글
+		if(trim($this->soo_map_api))
+		{
+			if(strlen($this->soo_map_api) == 40)
+			{
+				$this->maps_api_type = 'daum';
+			}
+			elseif(strlen($this->soo_map_api) == 32)
+			{
+				$this->maps_api_type = 'naver';
+			}
+			else
+			{
+				$this->maps_api_type = 'google';
+			}
+		}
+
 		$uri = sprintf('http://maps.googleapis.com/maps/api/geocode/xml?address=%s&sensor=false&language=%s',urlencode($address),urlencode($this->langtype));
 		$xml_doc = $this->xml_api_request($uri);
 
@@ -121,8 +138,8 @@ class map_components extends EditorHandler {
 
 		}
 
-		/*if($this->soo_naver_map_api_key) {
-			$uri = sprintf('http://map.naver.com/api/geocode.php?key=%s&encoding=utf-8&coord=latlng&query=%s',$this->soo_naver_map_api_key,urlencode($address));
+		if($this->maps_api_type == 'naver') {
+			$uri = sprintf('http://map.naver.com/api/geocode.php?key=%s&encoding=utf-8&coord=latlng&query=%s',$this->soo_map_api,urlencode($address));
 			$xml_doc = $this->xml_api_request($uri);
 
 			$item = $xml_doc->geocode->item;
@@ -143,7 +160,7 @@ class map_components extends EditorHandler {
 				}
 
 			}
-		}*/
+		}
 
 		if($this->soo_daum_local_api_key) {
 			$uri = sprintf('http://apis.daum.net/local/geo/addr2coord?apikey=%s&q=%s&output=xml',$this->soo_daum_local_api_key,urlencode($address));
@@ -350,6 +367,7 @@ class map_components extends EditorHandler {
 					'var mapTypeControl = new daum.maps.MapTypeControl();'.
 					'ggl_map'.$map_count.'.addControl(mapTypeControl, daum.maps.ControlPosition.TOPRIGHT);'.
 					'addMarker(ggl_map'.$map_count.',marker_points)}</script>';
+			$zoom = intval(20-$zoom);
 		}
 		elseif($this->maps_api_type == 'naver')
 		{
@@ -367,6 +385,7 @@ class map_components extends EditorHandler {
 					'ggl_map'.$map_count.'.addControl(mapTypeControl);'.
 					'mapTypeControl.setPosition({ top : 10, right : 10 });'.
 					'addMarker(ggl_map'.$map_count.',marker_points)}</script>';
+			$zoom = intval($zoom)+5;
 		}
 		else
 		{
@@ -383,15 +402,9 @@ class map_components extends EditorHandler {
 
 
 		if(Context::getResponseMethod() != 'HTML') {
-			if(count($map_locations) > 0)
-			{
-				$view_code = '';
-				foreach($map_locations as $key => $location)
-				{
-					$style = 'text-align:center; width: 100%; margin:15px 0px;';
-					$view_code .= '<div style="'.$style.'" class="soo_maps"><img src="'.htmlspecialchars($this->getImageMapLink(($location['map_lat'].','.$location['map_lng']), ($location['marker_lat'].','.$location['marker_lng']), $location['map_zoom'], $width, $height)).'" /></div>';
-				}
-			}
+			$style = 'text-align:center; width: 100%; margin:15px 0px;';
+			$view_code .= '<div style="'.$style.'" class="soo_maps"><img src="'.htmlspecialchars($this->getImageMapLink($lat.','.$lng, $map_markers, $zoom, $width, $height)).'" /></div>';
+
 		} elseif(Context::get('act') == 'dispPageAdminContentModify') {
 			$view_code = sprintf("<img src='%s' width='%d' height='%d' alt='Map Component' />",str_replace('&amp;amp;','&amp;',htmlspecialchars($xml_obj->attrs->src)), $width, $height);
 		} else {
@@ -403,9 +416,16 @@ class map_components extends EditorHandler {
 		return $view_code;
 	}
 
+	function getImageMapLink($center, $markers, $zoom, $width=600, $height=400) {
+		$output = "https://maps-api-ssl.google.com/maps/api/staticmap?center=".$center."&zoom=".$zoom."&size=".$width."x".$height;
+		$positions = explode(";", $markers);
+		foreach($positions as $position) {
+			if(!trim($position)) continue;
+			$output .= "&markers=size:mid|".$position;
+		}
+		$output .= "&sensor=false";
 
-	function getImageMapLink($center, $marker, $zoom, $width=320, $height=400) {
-		return sprintf("https://maps-api-ssl.google.com/maps/api/staticmap?language=%s&center=%s&zoom=%s&size=%sx%s&markers=size:mid|%s&sensor=false", $this->langtype, $center, $zoom, intval($width), intval($height), $marker);
+		return $output;
 	}
 
 }
