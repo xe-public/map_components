@@ -183,10 +183,10 @@ class map_components extends EditorHandler {
 			{
 				$this->maps_api_type = 'daum';
 			}
-			/*elseif(strlen($this->soo_map_api) == 32)
+			elseif(strlen($this->soo_map_api) == 32)
 			{
 				$this->maps_api_type = 'naver';
-			}*/
+			}
 			else
 			{
 				$this->maps_api_type = 'google';
@@ -211,12 +211,12 @@ class map_components extends EditorHandler {
 			Context::set('tpl_path', $tpl_path);
 			Context::addHtmlHeader($map_comp_header_script);
 		}
-		/*elseif($this->maps_api_type == 'naver')
+		elseif($this->maps_api_type == 'naver')
 		{
 			$this->map_comp_lat = 37.57;
 			$this->map_comp_lng = 126.98;
 
-			$map_comp_header_script = '<script src="https://apis.daum.net/maps/maps3.js?apikey='.$this->soo_map_api.'"></script>';
+			$map_comp_header_script = '<script src="http://openapi.map.naver.com/openapi/naverMap.naver?ver=2.0&amp;key='.$this->soo_map_api.'"></script>';
 			$map_comp_header_script .= '<script>'.
 				sprintf(
 					'var defaultlat="%s";'.
@@ -227,7 +227,7 @@ class map_components extends EditorHandler {
 			Context::set('maps_api_type', $this->maps_api_type);
 			Context::set('tpl_path', $tpl_path);
 			Context::addHtmlHeader($map_comp_header_script);
-		}*/
+		}
 		else
 		{
 			if(Context::getLangType() == 'ko') // Seoul
@@ -276,10 +276,10 @@ class map_components extends EditorHandler {
 			{
 				$this->maps_api_type = 'daum';
 			}
-			/*elseif(strlen($this->soo_map_api) == 32)
+			elseif(strlen($this->soo_map_api) == 32)
 			{
 				$this->maps_api_type = 'naver';
-			}*/
+			}
 			else
 			{
 				$this->maps_api_type = 'google';
@@ -314,62 +314,73 @@ class map_components extends EditorHandler {
 			{
 				$header_script .= '<script src="https://apis.daum.net/maps/maps3.js?apikey='.$this->soo_map_api.'"></script><style type="text/css">span.soo_maps {display:block;} span.soo_maps img {max-width:none;}span.soo_maps>a>img {max-width:100%;}</style>'."\n";
 			}
+			elseif($this->maps_api_type == 'naver')
+			{
+				$header_script .= '<script src="http://openapi.map.naver.com/openapi/naverMap.naver?ver=2.0&amp;key='.$this->soo_map_api.'"></script><style type="text/css">span.soo_maps {display:block;} span.soo_maps img {max-width:none;}span.soo_maps>a>img {max-width:100%;}</style>'."\n";
+			}
 			else
 			{
 				$header_script .= '<script src="https://maps-api-ssl.google.com/maps/api/js?sensor=false&amp;language='.$this->langtype.'"></script><style type="text/css">.gmnoprint div[title^="Pan"],.gmnoprint div[title~="이동"] {opacity: 0 !important;}span.soo_maps {display:block;} span.soo_maps img {max-width:none;}span.soo_maps>a>img {max-width:100%;}</style>'."\n";
 			}
 			
 		}
-		if(!$data->location_no) { // 단일 위치 지도 one pointed map
-			$map_center = explode(',', trim($data->map_center));
-			$lat = $map_center[0];
-			settype($lat,"float");
-			$lng = $map_center[1];;
-			settype($lng,"float");
 
-			$map_markers = trim($data->map_markers);
-			$map_markers = preg_replace('/[^0-9\.\,\;]+/i', '', $map_markers);
+		$map_center = explode(',', trim($data->map_center));
+		$lat = $map_center[0];
+		settype($lat,"float");
+		$lng = $map_center[1];;
+		settype($lng,"float");
 
-			$zoom = intval(trim($data->map_zoom));
+		$map_markers = trim($data->map_markers);
+		$map_markers = preg_replace('/[^0-9\.\,\;]+/i', '', $map_markers);
 
-			$map_locations = array();
-			$map_locations[0] = array(
-						'map_lat' => $lat,
-						'map_lng' => $lng,
-						'marker_lng' => $marker_lng,
-						'marker_lat' => $marker_lat,
-						'map_zoom' => $zoom
-						);
+		$zoom = intval(trim($data->map_zoom));
 
-			if($this->maps_api_type == 'daum')
-			{
-				$zoom = intval(20-$zoom);
-				Context::loadFile(array('./modules/editor/components/map_components/front/js/daum_maps.js', 'head', '', null), true);
-				$header_script .= '<script>'.
-					'function ggl_map_init'.$map_count.'() {'.
-						'var mapOption = { level: '.$zoom.', center: new daum.maps.LatLng('.$lat.', '.$lng.') };'.
-						'var marker_points = "'.$map_markers.'";'.
-						'var ggl_map'.$map_count.' = new daum.maps.Map(document.getElementById("ggl_map_canvas'.$map_count.'"), mapOption);'.
-						'var zoomControl = new daum.maps.ZoomControl();'.
-						'ggl_map'.$map_count.'.addControl(zoomControl, daum.maps.ControlPosition.LEFT);'.
-						'var mapTypeControl = new daum.maps.MapTypeControl();'.
-						'ggl_map'.$map_count.'.addControl(mapTypeControl, daum.maps.ControlPosition.TOPRIGHT);'.
-						'addMarker(ggl_map'.$map_count.',marker_points)}</script>';
-			}
-			else
-			{
-				Context::loadFile(array('./modules/editor/components/map_components/front/js/google_maps.js', 'head', '', null), true);
-				$header_script .= '<script>'.
-					'function ggl_map_init'.$map_count.'() {'.
-						'var mapOption = { zoom: '.$zoom.', mapTypeId: google.maps.MapTypeId.ROADMAP, center: new google.maps.LatLng('.$lat.', '.$lng.'), mapTypeControl: true, mapTypeControlOptions: { style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR, position: google.maps.ControlPosition.TOP_RIGHT }, panControl: false, zoomControl: true, zoomControlOptions: { style: google.maps.ZoomControlStyle.LARGE, position: google.maps.ControlPosition.LEFT_CENTER }, scaleControl: false, streetViewControl: false};'.
-						'var marker_points = "'.$map_markers.'";'.
-						'var ggl_map'.$map_count.' = new google.maps.Map(document.getElementById("ggl_map_canvas'.$map_count.'"), mapOption);'.
-						'addMarker(ggl_map'.$map_count.',marker_points)}</script>';
-			}
-
-			Context::addHtmlHeader($header_script);
-		} else {
+		if($this->maps_api_type == 'daum')
+		{
+			$zoom = intval(20-$zoom);
+			Context::loadFile(array('./modules/editor/components/map_components/front/js/daum_maps.js', 'head', '', null), true);
+			$header_script .= '<script>'.
+				'function ggl_map_init'.$map_count.'() {'.
+					'var mapOption = { level: '.$zoom.', center: new daum.maps.LatLng('.$lat.', '.$lng.') };'.
+					'var marker_points = "'.$map_markers.'";'.
+					'var ggl_map'.$map_count.' = new daum.maps.Map(document.getElementById("ggl_map_canvas'.$map_count.'"), mapOption);'.
+					'var zoomControl = new daum.maps.ZoomControl();'.
+					'ggl_map'.$map_count.'.addControl(zoomControl, daum.maps.ControlPosition.LEFT);'.
+					'var mapTypeControl = new daum.maps.MapTypeControl();'.
+					'ggl_map'.$map_count.'.addControl(mapTypeControl, daum.maps.ControlPosition.TOPRIGHT);'.
+					'addMarker(ggl_map'.$map_count.',marker_points)}</script>';
 		}
+		elseif($this->maps_api_type == 'naver')
+		{
+			$zoom = intval($zoom)-5;
+			Context::loadFile(array('./modules/editor/components/map_components/front/js/naver_maps.js', 'head', '', null), true);
+			$header_script .= '<script>'.
+				'function ggl_map_init'.$map_count.'() {'.
+					'var mapOption = { zoom: '.$zoom.', point: new nhn.api.map.LatLng('.$lat.', '.$lng.'), enableWheelZoom : true, enableDragPan : true, enableDblClickZoom : true, mapMode : 0, activateTrafficMap : false, activateBicycleMap : false, };'.
+					'var marker_points = "'.$map_markers.'";'.
+					'var ggl_map'.$map_count.' = new nhn.api.map.Map("ggl_map_canvas'.$map_count.'", mapOption);'.
+					'var zoomControl = new nhn.api.map.ZoomControl();'.
+					'ggl_map'.$map_count.'.addControl(zoomControl);'.
+					'zoomControl.setPosition({ top : 10, left : 10 });'.
+					'var mapTypeControl = new nhn.api.map.MapTypeBtn();'.
+					'ggl_map'.$map_count.'.addControl(mapTypeControl);'.
+					'mapTypeControl.setPosition({ top : 10, right : 10 });'.
+					'addMarker(ggl_map'.$map_count.',marker_points)}</script>';
+		}
+		else
+		{
+			Context::loadFile(array('./modules/editor/components/map_components/front/js/google_maps.js', 'head', '', null), true);
+			$header_script .= '<script>'.
+				'function ggl_map_init'.$map_count.'() {'.
+					'var mapOption = { zoom: '.$zoom.', mapTypeId: google.maps.MapTypeId.ROADMAP, center: new google.maps.LatLng('.$lat.', '.$lng.'), mapTypeControl: true, mapTypeControlOptions: { style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR, position: google.maps.ControlPosition.TOP_RIGHT }, panControl: false, zoomControl: true, zoomControlOptions: { style: google.maps.ZoomControlStyle.LARGE, position: google.maps.ControlPosition.LEFT_CENTER }, scaleControl: false, streetViewControl: false};'.
+					'var marker_points = "'.$map_markers.'";'.
+					'var ggl_map'.$map_count.' = new google.maps.Map(document.getElementById("ggl_map_canvas'.$map_count.'"), mapOption);'.
+					'addMarker(ggl_map'.$map_count.',marker_points)}</script>';
+		}
+
+		Context::addHtmlHeader($header_script);
+
 
 		if(Context::getResponseMethod() != 'HTML') {
 			if(count($map_locations) > 0)
@@ -392,120 +403,6 @@ class map_components extends EditorHandler {
 		return $view_code;
 	}
 
-	function altViewGMap() {
-		$this->mobile_set = false;
-		if(class_exists('Mobile')) {
-			if(Mobile::isMobileCheckByAgent()) {
-				$this->mobile_set = true;
-			}
-		}
-
-		if($this->mobile_set == true) {
-			return $this->viewImageMap();
-		} else {
-			return $this->viewScriptMap();
-		}
-	}
-	
-	function viewScriptMap() {
-		// 모바일 및 RSS용 페이지 필요.
-		$header_script = '';
-
-		$header_script .= '<script type="text/javascript" src="https://maps-api-ssl.google.com/maps/api/js?sensor=true"></script>'."\n";
-		$location_no = intval(Context::get('location_no'));
-
-		if(trim($this->soo_maptypecontrol)) $maptypeCtrl = 'false';
-		else $maptypeCtrl = 'true';
-
-		if($location_no>1) {
-			$header_script .= '<script type="text/javascript">//<![CDATA['.
-				'<!--'.
-				'function ggl_map_init() {'.
-					'var mapOption = { zoom:8, mapTypeControl: '.$maptypeCtrl.' mapTypeId: google.maps.MapTypeId.ROADMAP }'.
-					'var infowindow = new google.maps.InfoWindow({content: ""}); var ggl_map = new google.maps.Map(document.getElementById("ggl_map_canvas"), mapOption);'."\n";
-			for($i=0;$i<$location_no;$i++) {
-				$lat = trim(Context::get('map_lat'.$i));
-				settype($lat,"float");
-				$lng = trim(Context::get('map_lng'.$i));
-				settype($lng,"float");
-				$marker_lng = trim(Context::get('marker_lng'.$i));
-				settype($marker_lng,"float");
-				$marker_lat = trim(Context::get('marker_lat'.$i));
-				settype($marker_lat,"float");
-				$zoom = trim(Context::get('map_zoom'.$i));
-				settype($zoom,"int");
-				if(!$lat || !$lng || !$marker_lng || !$marker_lat || !$zoom) {
-					return 'f';
-					break;
-				}
-				if($i==0) {
-					$header_script .= 'ggl_map.setCenter(new google.maps.LatLng('.$lat.', '.$lng.'));'.'ggl_map.setZoom('.$zoom.');'."\n";
-				}
-				$header_script .= 'var ggl_markerlatlng_'.$i.' = new google.maps.LatLng('.$marker_lat.', '.$marker_lng.');'.
-					'var ggl_marker_'.$i.' = new google.maps.Marker({ position: ggl_markerlatlng_'.$i.', map: ggl_map, draggable: false});'.
-					'ggl_marker_'.$i.'.setMap(ggl_map);'."\n";
-
-				$header_script .= 'google.maps.event.addListener(ggl_marker_'.$i.', \'click\', function(){'.
-					'ggl_map.setZoom('.$zoom.');'.
-					'ggl_map.panTo(new google.maps.LatLng('.$lat.', '.$lng.'));'.
-					'infowindow.close();'."\n";
-				$header_script .=  '});'.'ggl_marker_'.$i.'.setMap(ggl_map);'."\n";
-			}
-			$header_script .= '}'.'//-->'.'//]]>'.'</script>';
-
-		} else {
-			$lat = trim(Context::get('map_lat'));
-			settype($lat,"float");
-			$lng = trim(Context::get('map_lng'));
-			settype($lng,"float");
-			$marker_lng = trim(Context::get('marker_lng'));
-			settype($marker_lng,"float");
-			$marker_lat = trim(Context::get('marker_lat'));
-			settype($marker_lat,"float");
-			$zoom = trim(Context::get('map_zoom'));
-			settype($zoom,"int");
-
-			$header_script .= '<script type="text/javascript">//<![CDATA['.
-				'//<!--'.
-				'function ggl_map_init() {'.
-					'var mapOption = { zoom: '.$zoom.', mapTypeControl: '.$maptypeCtrl.' mapTypeId: google.maps.MapTypeId.ROADMAP }'.
-					'var ggl_map = new google.maps.Map(document.getElementById("ggl_map_canvas"), mapOption);'.
-					'ggl_map.setCenter(new google.maps.LatLng('.$lat.', '.$lng.'));'.
-					'var ggl_markerlatlng = new google.maps.LatLng('.$marker_lat.', '.$marker_lng.');'.
-					'var ggl_marker = new google.maps.Marker({ position: ggl_markerlatlng, map: ggl_map, draggable: false});'.
-					'var infowindow = new google.maps.InfoWindow({ content: \'\' });'.
-					'ggl_marker.setMap(ggl_map);'."\n";
-				$header_script .= '}'.'//-->'.'//]]>'.'</script>';
-		}
-		$view_code = '<div id="ggl_map_canvas"></div>'."\n";
-
-		header("Content-Type: text/html; charset=UTF-8");
-		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
-		header("Cache-Control: no-store, no-cache, must-revalidate");
-		header("Cache-Control: post-check=0, pre-check=0", false);
-		header("Pragma: no-cache");
-		header("Set-Cookie: ");
-		print '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"'.
-			'"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'.
-			'<html xmlns="http://www.w3.org/1999/xhtml" lang="ko" xml:lang="ko">'.
-			'<head>'.
-			'<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />'.
-			'<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>'.
-			'<style type="text/css">'.
-			'html { height: 100%; }'.
-			'body { height: 100%; margin: 0px; padding: 0px }'.
-			'#ggl_map_canvas { height: 100% }'.
-			'</style>'.
-			$header_script.
-			'<title></title>'.
-			'</head>'.
-			'<body onload="ggl_map_init();">'.
-			$view_code.
-			'</body>'.
-			'</html>';
-		exit();
-
-	}
 
 	function getImageMapLink($center, $marker, $zoom, $width=320, $height=400) {
 		return sprintf("https://maps-api-ssl.google.com/maps/api/staticmap?language=%s&center=%s&zoom=%s&size=%sx%s&markers=size:mid|%s&sensor=false", $this->langtype, $center, $zoom, intval($width), intval($height), $marker);

@@ -1,5 +1,7 @@
 /* Map Component by MinSoo Kim. (c) 2014 MinSoo Kim. (misol.kr@gmail.com) */
-var map_zoom = 13, map_lat = '', map_lng = '', map = '', marker = '', map_markers = new Array(), map_marker_positions = '', modi_marker_pos = '', saved_location = new Array(), result_array = new Array(), result_from = '';
+var map_zoom = 10, map_lat = '', map_lng = '', map = '', marker = '', map_markers = new Array(), map_marker_positions = '', modi_marker_pos = '', saved_location = new Array(), result_array = new Array(), result_from = '', oIcon = '';
+
+var tester = '';
 /*
 
 ** 2014 08 11 TODO LIST **
@@ -69,33 +71,21 @@ function address_adder(results) {
 		if(results[i].formatted_address || results[i].formatted_address != null) {
 			result_array[i] = { from: results[i].result_from,
 				formatted_address: results[i].formatted_address,
-				geometry: {location : new google.maps.LatLng(results[i].geometry.lat, results[i].geometry.lng) } };
+				geometry: {location : new nhn.api.map.LatLng(results[i].geometry.lat, results[i].geometry.lng) } };
 		}
 	}
 	view_list();
 }
 
 function getMaps() {
+	oIcon = new nhn.api.map.Icon('http://static.naver.com/maps2/icons/pin_spot2.png', new nhn.api.map.Size(28, 37), new nhn.api.map.Size(14, 37));
+
 	var mapOption = {
 		zoom: map_zoom,
-		center: new google.maps.LatLng(defaultlat, defaultlng),
-		mapTypeId: google.maps.MapTypeId.ROADMAP,
-		mapTypeControl: true,
-		mapTypeControlOptions: {
-			style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
-			position: google.maps.ControlPosition.TOP_RIGHT
-		},
-		panControl: false,
-		zoomControl: true,
-		zoomControlOptions: {
-			style: google.maps.ZoomControlStyle.LARGE,
-			position: google.maps.ControlPosition.LEFT_CENTER
-		},
-		scaleControl: false,
-		streetViewControl: false,
-		disableDoubleClickZoom: true
+		point: new nhn.api.map.LatLng(defaultlat, defaultlng),
+		enableDblClickZoom : false
 	}
-	map = new google.maps.Map(document.getElementById("map_canvas"), mapOption);
+	map = new nhn.api.map.Map("map_canvas", mapOption);
 
 	if(typeof(opener) !="undefined" && opener != null)
 	{
@@ -119,54 +109,76 @@ function getMaps() {
 				img_data = ret_obj['results'];
 
 				var center_split = img_data['map_center'].split(',');
-				center = new google.maps.LatLng(center_split[0], center_split[1]);
+				center = new nhn.api.map.LatLng(center_split[0], center_split[1]);
 				map.setCenter(center);
 
-				map_lat = center.lng();
-				map_lng = center.lat();
+				map_lat = center.getLng();
+				map_lng = center.getLat();
 
 				var markers_split = img_data['map_markers'].split(';');
 				map_marker_positions = img_data['map_markers'].trim();
 				marker = addMarker(0);
 
-				map_zoom = parseInt(img_data['map_zoom'],10);
-				if(!map_zoom) map_zoom = 13;
-				map.setZoom(map_zoom);
+				map_zoom = parseInt(img_data['map_zoom'],10) - 5;
+				if(!map_zoom) map_zoom = 10;
+				map.setLevel(map_zoom);
 			}, response_tags);
 	} else {
-		center = new google.maps.LatLng(defaultlat, defaultlng);
+		center = new nhn.api.map.LatLng(defaultlat, defaultlng);
 		map.setCenter(center);
 		var center = map.getCenter();
 
 		jQuery("#width").val('600');
 		jQuery("#height").val('400');
-		map.setZoom(map_zoom);
+		map.setLevel(map_zoom);
 	}
 
-	google.maps.event.addListener(map, 'click', function(MouseEvent) {
-		latlng = MouseEvent.latLng;
-		addMarker(latlng);
+	var zoomControl = new nhn.api.map.ZoomControl();
+	map.addControl(zoomControl);
+	zoomControl.setPosition({ top : 10, left : 10 });
+	var mapTypeControl = new nhn.api.map.MapTypeBtn();
+	map.addControl(mapTypeControl);
+	mapTypeControl.setPosition({ top : 10, right : 10 });
+
+	map.attach('click', function(event) {
+		var oTarget = event.target;
+		if (oTarget instanceof nhn.api.map.Marker) {
+			var position = event.target.getPoint();
+			if(typeof(position) == "undefined") return;
+			removeMarker(position);
+		} else {
+			var position = event.point;
+			map_marker_positions += position.getLat() + ',' + position.getLng() + ';';
+			addMarker(0);
+		}
+		return false;
 	});
 
 }
 
 /* 새로운 위치에 마커 추가. latlng = 0 인 경우, map_marker_positions 에 지정된 마커 새로 찍음 */
 function addMarker(latlng) {
+	if(typeof(latlng) == "undefined") return;
 	var new_marker_obj;
 	/* 전체 구조는 removeMarker() 와 동일*/
 	// 마커 일단 다 제거
 	if(typeof(map_markers) != "undefined") {
+		// 마커 일단 다 제거
 		for(var i = 0; i < map_markers.length; i++)
 		{
-			map_markers[i].setMap(null);
+			map.removeOverlay(map_markers[i]);
 		}
 	}
+
 	map_markers = new Array();
 
 	if(latlng != 0) {
+		var latitude = latlng.getLat();
+		var longitude = latlng.getLng();
+
 		// 중복되는 마커는 생성되지 않도록.
-		map_marker_positions = positionstrRemover(latlng, map_marker_positions);
-		map_marker_positions += latlng.lat() + ',' + latlng.lng() + ';'; /* removeMarker() 와 다른 곳 */
+		map_marker_positions = map_marker_positions.replace(latitude+','+longitude+';', '');
+		map_marker_positions += latitude + ',' + longitude + ';'; /* removeMarker() 와 다른 곳 */
 	}
 
 	positions = makeLocationArray(map_marker_positions);
@@ -174,29 +186,12 @@ function addMarker(latlng) {
 	// 전체 마커 다시 생성
 	for(var i = 0; i < positions.length; i++)
 	{
-		map_markers[i] = new google.maps.Marker({
-			position: positions[i]
+		map_markers[i] = new nhn.api.map.Marker(oIcon, {
+			point: positions[i]
 		});
-		map_markers[i].setMap(map);
-		map_markers[i].setDraggable(true);
-		map_markers[i].soo_position = positions[i];
-		new_marker_obj = map_markers[i];
+		map.addOverlay(map_markers[i]);
 
-		// 이벤트 등록 드래그 시작과 끝은 전후 관계로 연결 되어있음
-		google.maps.event.addListener(map_markers[i], "dragstart", function() {
-			var position = this.soo_position;
-			map_marker_positions = positionstrRemover(position, map_marker_positions);
-		});
-		google.maps.event.addListener(map_markers[i], "dragend", function() {
-			var position = this.getPosition();
-			map_marker_positions = positionstrRemover(position, map_marker_positions);
-			map_marker_positions += position.lat() + ',' + position.lng() + ';';
-			addMarker(0);
-		});
-		google.maps.event.addListener(map_markers[i], "click", function() {
-			var position = this.soo_position;
-			removeMarker(position);
-		});
+		new_marker_obj = map_markers[i];
 	}
 
 	// 추가된 마커가 배열의 가장 마지막에 있을거란 가정 하에 마지막 마커 리턴
@@ -204,44 +199,28 @@ function addMarker(latlng) {
 
 }
 function removeMarker(latlng) {
-/* 전체 구조는 removeMarker() 와 동일*/
+	if(typeof(latlng) == "undefined") return;
 	// 마커 일단 다 제거
 	for(var i = 0; i < map_markers.length; i++)
 	{
-		map_markers[i].setMap(null);
+		map.removeOverlay(map_markers[i]);
 	}
 	map_markers = new Array();
 
+	var latitude = latlng.getLat();
+	var longitude = latlng.getLng();
+
 	// 마커 위치 제거
-	map_marker_positions = positionstrRemover(latlng, map_marker_positions);
+	map_marker_positions = map_marker_positions.replace(latitude+','+longitude+';', '');
 	positions = makeLocationArray(map_marker_positions);
 
 	// 전체 마커 다시 생성
 	for(var i = 0; i < positions.length; i++)
 	{
-		map_markers[i] = new google.maps.Marker({
-			position: positions[i]
+		map_markers[i] = new nhn.api.map.Marker(oIcon, {
+			point: positions[i]
 		});
-		map_markers[i].setMap(map);
-		map_markers[i].setDraggable(true);
-		map_markers[i].soo_position = positions[i];
-		new_marker_obj = map_markers[i];
-
-		// 이벤트 등록 드래그 시작과 끝은 전후 관계로 연결 되어있음
-		google.maps.event.addListener(map_markers[i], "dragstart", function() {
-			var position = this.soo_position;
-			map_marker_positions = positionstrRemover(position, map_marker_positions);
-		});
-		google.maps.event.addListener(map_markers[i], "dragend", function() {
-			var position = this.getPosition();
-			map_marker_positions = positionstrRemover(position, map_marker_positions);
-			map_marker_positions += position.lat() + ',' + position.lng() + ';';
-			addMarker(0);
-		});
-		google.maps.event.addListener(map_markers[i], "click", function() {
-			var position = this.soo_position;
-			removeMarker(position);
-		});
+		map.addOverlay(map_markers[i]);
 	}
 
 }
@@ -253,7 +232,7 @@ function positionstrRemover(obj_position, str_positions) {
 	{
 		if(!arr_positions[i].trim()) continue;
 		var position = arr_positions[i].split(",");
-		var obj_base_position = new google.maps.LatLng(position[0],position[1]);
+		var obj_base_position = new nhn.api.map.LatLng(position[0],position[1]);
 		if(obj_base_position.equals(obj_position))
 		{
 			str_positions = str_positions.replace(arr_positions[i] + ';', '');
@@ -269,7 +248,7 @@ function makeLocationArray(str_position) {
 	{
 		if(!positions[i].trim()) continue;
 		var position = positions[i].split(",");
-		arr_positons[i] = new google.maps.LatLng(position[0],position[1]);
+		arr_positons[i] = new nhn.api.map.LatLng(position[0],position[1]);
 	}
 	return arr_positons;
 }
@@ -278,17 +257,18 @@ function makeLocationStr(arr_position) {
 
 	for(var i = 0; i < arr_position.length; i++)
 	{
-		str_positons += arr_position[i].lat() + ',' + arr_position[i].lng() + ';';
+		str_positons += arr_position[i].getLat() + ',' + arr_position[i].getLng() + ';';
 	}
 	return str_positons;
 }
+
 function insertMap(obj) {
 	if(typeof(opener)=="undefined" || !opener) return;
 	var width = jQuery("#width").val(), height = jQuery("#height").val();
 
-	map_zoom = map.getZoom();
-	map_lat = map.getCenter().lat();
-	map_lng = map.getCenter().lng();
+	map_zoom = map.getLevel() + 5;
+	map_lat = map.getCenter().getLat();
+	map_lng = map.getCenter().getLng();
 	if(!width) {width = '600'}
 	if(!height) {height = '400'}
 
