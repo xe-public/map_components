@@ -143,7 +143,7 @@ function getMaps() {
 		map.setZoom(map_zoom);
 	}
 
-	google.maps.event.addListener(map, 'click', function(MouseEvent) {
+	google.maps.event.addListener(map, 'dblclick', function(MouseEvent) {
 		latlng = MouseEvent.latLng;
 		addMarker(latlng);
 	});
@@ -193,7 +193,7 @@ function addMarker(latlng) {
 			map_marker_positions += position.lat() + ',' + position.lng() + ';';
 			addMarker(0);
 		});
-		google.maps.event.addListener(map_markers[i], "click", function() {
+		google.maps.event.addListener(map_markers[i], "rightclick", function() {
 			var position = this.soo_position;
 			removeMarker(position);
 		});
@@ -238,7 +238,7 @@ function removeMarker(latlng) {
 			map_marker_positions += position.lat() + ',' + position.lng() + ';';
 			addMarker(0);
 		});
-		google.maps.event.addListener(map_markers[i], "click", function() {
+		google.maps.event.addListener(map_markers[i], "rightclick", function() {
 			var position = this.soo_position;
 			removeMarker(position);
 		});

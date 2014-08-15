@@ -4,7 +4,7 @@
 	<title xml:lang="en">Maps</title>
 	<description xml:lang="ko">지도를 원하는 곳에 추가하거나 수정할 수 있습니다. Google Maps API, 다음 지도 API, 다음 로컬 API 등이 사용되었습니다.</description>
 	<description xml:lang="en">Maps can be inserted in your documents. Google Maps API, Daum Maps API, Daum Local API and some other APIs are included.</description>
-	<version>1.1</version>
+	<version>1.0</version>
 	<date>2014-08-15</date>
 	<license link="http://www.gnu.org/licenses/gpl-3.0.html">GPLv3</license>
 	<author email_address="misol.kr@gmail.com">

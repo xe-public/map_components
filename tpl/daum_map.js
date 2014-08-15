@@ -133,7 +133,7 @@ function getMaps() {
 	var mapTypeControl = new daum.maps.MapTypeControl();
 	map.addControl(mapTypeControl, daum.maps.ControlPosition.TOPRIGHT);
 
-	daum.maps.event.addListener(map, 'click', function(MouseEvent) {
+	daum.maps.event.addListener(map, 'dblclick', function(MouseEvent) {
 		latlng = MouseEvent.latLng;
 		addMarker(latlng);
 	});
@@ -186,7 +186,7 @@ function addMarker(latlng) {
 			map_marker_positions += position.getLat() + ',' + position.getLng() + ';';
 			addMarker(0);
 		});
-		daum.maps.event.addListener(map_markers[i], "click", function() {
+		daum.maps.event.addListener(map_markers[i], "rightclick", function() {
 			var position = this.soo_position;
 			removeMarker(position);
 		});
@@ -233,7 +233,7 @@ function removeMarker(latlng) {
 			map_marker_positions += position.getLat() + ',' + position.getLng() + ';';
 			addMarker(0);
 		});
-		daum.maps.event.addListener(map_markers[i], "click", function() {
+		daum.maps.event.addListener(map_markers[i], "rightclick", function() {
 			var position = this.soo_position;
 			removeMarker(position);
 		});
