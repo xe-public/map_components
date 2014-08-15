@@ -17,3 +17,4 @@ input[type=text] {
 }
 #view_list{margin:0;}
 li.result_lists>a{box-sizing:border-box;display:block;text-decoration:none;width:100%;font-size:15px;height:31px;padding:5px 10px;border-bottom:1px dotted #8e8e93;overflow:hidden;direction:rtl;text-overflow:ellipsis;white-space : nowrap; }
+#helpDiv{display:none;position:absolute;top:0;margin:0px auto;padding:0;width:800px;height:455px;z-index:100000;}
