@@ -15,7 +15,7 @@ function addMarker(target_map, map_marker_positions) {
 
 }
 function makeLocationArray(str_position) {
-	var arr_positons = new Array();
+	var arr_positons = [];
 	var positions = str_position.split(";");
 	for(var i = 0; i < positions.length; i++)
 	{

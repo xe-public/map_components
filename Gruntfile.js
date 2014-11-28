@@ -46,9 +46,9 @@ module.exports = function(grunt) {
 		csslint: {
 			'common-css': {
 				options: {
-					import : 2,
+					'import' : 2,
 					'adjoining-classes' : false,
-					'box-model' : false,
+					'box-sizing' : false,
 					'duplicate-background-images' : false,
 					'ids' : false,
 					'important' : false,
@@ -56,9 +56,10 @@ module.exports = function(grunt) {
 					'qualified-headings' : false,
 					'star-property-hack' : false,
 					'underscore-property-hack' : false,
+					'regex-selectors' : false,
 				},
 				src: [
-					'tpl/css/*.css',
+					'tpl/*.css',
 					'!**/*.min.css',
 				]
 			}

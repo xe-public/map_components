@@ -1,6 +1,16 @@
 /* Map Component by MinSoo Kim. (c) 2014 MinSoo Kim. (misol.kr@gmail.com) */
-var map_zoom = 10, map_lat = '', map_lng = '', map = '', marker = '', map_markers = new Array(), map_marker_positions = '', modi_marker_pos = '', saved_location = new Array(), result_array = new Array(), result_from = '', oIcon = '';
-
+var map_zoom = 10,
+	map_lat = '',
+	map_lng = '',
+	map = '',
+	marker = '',
+	map_markers = [],
+	map_marker_positions = '',
+	modi_marker_pos = '',
+	saved_location = [],
+	result_array = [],
+	result_from = '',
+	oIcon = '';
 var tester = '';
 /*
 
@@ -31,13 +41,13 @@ function map_point(i) { //검색된 위치 정보를 배열에서 로드
 }
 function view_list() { //검색된 위치 정보를 배열에서 리스트로 뿌림
 	var html = '';
-	if(result_array.length == 0) 
+	if(result_array.length === 0) 
 	{
 		alert(no_result);
 		return;
 	}
 	for(var i=0;i<result_array.length;i++) {
-		if(i==0) {
+		if(i === 0) {
 			html += '<ul id="view_list">';
 		}
 		if(result_array.length==1) { map_point('0'); }
@@ -54,28 +64,28 @@ function showLocation(address) {
 	result_from = '';
 	if(!address) return;
 
-	var params = new Array();
-	params['component'] = "map_components";
-	params['address'] = address;
-	params['method'] = "search";
+	var params = [];
+	params.component = "map_components";
+	params.address = address;
+	params.method = "search";
 
-	var response_tags = new Array('error','message','results');
+	var response_tags = ['error','message','results'];
 	exec_xml('editor', 'procEditorCall', params, function(a,b) { complete_search(a,b,address); }, response_tags);
 }
 
 function complete_search(ret_obj, response_tags, address) {
-	var results = ret_obj['results'];
+	var results = ret_obj.results;
 	if(results) results = results.item;
-	else results = new Array();
+	else results = [];
 
 	address_adder(results);
 }
 function address_adder(results) {
-	result_array = new Array();
-	if(typeof(results.length) == "undefined") results = new Array(results);
+	result_array = [];
+	if(typeof(results.length) == "undefined") results = [results];
 
 	for(var i=0;i<results.length;i++) {
-		if(results[i].formatted_address || results[i].formatted_address != null) {
+		if(results[i].formatted_address || results[i].formatted_address !== null) {
 			result_array[i] = { from: results[i].result_from,
 				formatted_address: results[i].formatted_address,
 				geometry: {location : new nhn.api.map.LatLng(results[i].geometry.lat, results[i].geometry.lng) } };
@@ -87,16 +97,17 @@ function address_adder(results) {
 function getMaps() {
 	oIcon = new nhn.api.map.Icon('http://static.naver.com/maps2/icons/pin_spot2.png', new nhn.api.map.Size(28, 37), new nhn.api.map.Size(14, 37));
 
+	var node;
 	var mapOption = {
 		zoom: map_zoom,
 		point: new nhn.api.map.LatLng(defaultlat, defaultlng),
 		enableDblClickZoom : false
-	}
+	};
 	map = new nhn.api.map.Map("map_canvas", mapOption);
 
-	if(typeof(opener) !="undefined" && opener != null)
+	if(typeof(opener) !="undefined" && opener !== null)
 	{
-		var node = opener.editorPrevNode;
+		node = opener.editorPrevNode;
 	}
 
 	if(typeof(node) !="undefined" && node && node.nodeName == "IMG") {
@@ -106,30 +117,30 @@ function getMaps() {
 				'style': node.getAttribute('style'),
 				'data': node.getAttribute('alt')
 			};
-		var img_data = new Array();
+		var img_data = [];
 
-		var response_tags = new Array('error','message','width','height','results');
+		var response_tags = ['error','message','width','height','results'];
 		exec_xml('editor', 'procEditorCall', img_var, function(ret_obj,b) {
-				jQuery("#width").val(parseInt(ret_obj['width'],10));
-				jQuery("#height").val(parseInt(ret_obj['height'],10));
+			jQuery("#width").val(parseInt(ret_obj.width,10));
+			jQuery("#height").val(parseInt(ret_obj.height,10));
 
-				img_data = ret_obj['results'];
+			img_data = ret_obj.results;
 
-				var center_split = img_data['map_center'].split(',');
-				center = new nhn.api.map.LatLng(center_split[0], center_split[1]);
-				map.setCenter(center);
+			var center_split = img_data.map_center.split(',');
+			center = new nhn.api.map.LatLng(center_split[0], center_split[1]);
+			map.setCenter(center);
 
-				map_lat = center.getLng();
-				map_lng = center.getLat();
+			map_lat = center.getLng();
+			map_lng = center.getLat();
 
-				var markers_split = img_data['map_markers'].split(';');
-				map_marker_positions = img_data['map_markers'].trim();
-				marker = addMarker(0);
+			var markers_split = img_data.map_markers.split(';');
+			map_marker_positions = img_data.map_markers.trim();
+			marker = addMarker(0);
 
-				map_zoom = parseInt(img_data['map_zoom'],10) - 5;
-				if(!map_zoom) map_zoom = 10;
-				map.setLevel(map_zoom);
-			}, response_tags);
+			map_zoom = parseInt(img_data.map_zoom,10) - 5;
+			if(!map_zoom) map_zoom = 10;
+			map.setLevel(map_zoom);
+		}, response_tags);
 	} else {
 		center = new nhn.api.map.LatLng(defaultlat, defaultlng);
 		map.setCenter(center);
@@ -140,6 +151,7 @@ function getMaps() {
 		map.setLevel(map_zoom);
 	}
 
+	var position;
 	var zoomControl = new nhn.api.map.ZoomControl();
 	map.addControl(zoomControl);
 	zoomControl.setPosition({ top : 10, left : 10 });
@@ -150,11 +162,11 @@ function getMaps() {
 	map.attach('click', function(event) {
 		var oTarget = event.target;
 		if (oTarget instanceof nhn.api.map.Marker) {
-			var position = event.target.getPoint();
+			position = event.target.getPoint();
 			if(typeof(position) == "undefined") return;
 			removeMarker(position);
 		} else {
-			var position = event.point;
+			position = event.point;
 			map_marker_positions += position.getLat() + ',' + position.getLng() + ';';
 			addMarker(0);
 		}
@@ -166,20 +178,20 @@ function getMaps() {
 /* 새로운 위치에 마커 추가. latlng = 0 인 경우, map_marker_positions 에 지정된 마커 새로 찍음 */
 function addMarker(latlng) {
 	if(typeof(latlng) == "undefined") return;
-	var new_marker_obj;
+	var i, new_marker_obj;
 	/* 전체 구조는 removeMarker() 와 동일*/
 	// 마커 일단 다 제거
 	if(typeof(map_markers) != "undefined") {
 		// 마커 일단 다 제거
-		for(var i = 0; i < map_markers.length; i++)
+		for(i = 0; i < map_markers.length; i++)
 		{
 			map.removeOverlay(map_markers[i]);
 		}
 	}
 
-	map_markers = new Array();
+	map_markers = [];
 
-	if(latlng != 0) {
+	if(latlng !== 0) {
 		var latitude = latlng.getLat();
 		var longitude = latlng.getLng();
 
@@ -191,7 +203,7 @@ function addMarker(latlng) {
 	positions = makeLocationArray(map_marker_positions);
 
 	// 전체 마커 다시 생성
-	for(var i = 0; i < positions.length; i++)
+	for(i = 0; i < positions.length; i++)
 	{
 		map_markers[i] = new nhn.api.map.Marker(oIcon, {
 			point: positions[i]
@@ -207,12 +219,14 @@ function addMarker(latlng) {
 }
 function removeMarker(latlng) {
 	if(typeof(latlng) == "undefined") return;
+
+	var i;
 	// 마커 일단 다 제거
-	for(var i = 0; i < map_markers.length; i++)
+	for(i = 0; i < map_markers.length; i++)
 	{
 		map.removeOverlay(map_markers[i]);
 	}
-	map_markers = new Array();
+	map_markers = [];
 
 	var latitude = latlng.getLat();
 	var longitude = latlng.getLng();
@@ -222,7 +236,7 @@ function removeMarker(latlng) {
 	positions = makeLocationArray(map_marker_positions);
 
 	// 전체 마커 다시 생성
-	for(var i = 0; i < positions.length; i++)
+	for(i = 0; i < positions.length; i++)
 	{
 		map_markers[i] = new nhn.api.map.Marker(oIcon, {
 			point: positions[i]
@@ -249,7 +263,7 @@ function positionstrRemover(obj_position, str_positions) {
 }
 
 function makeLocationArray(str_position) {
-	var arr_positons = new Array();
+	var arr_positons = [];
 	var positions = str_position.split(";");
 	for(var i = 0; i < positions.length; i++)
 	{
@@ -276,40 +290,40 @@ function insertMap(obj) {
 	map_zoom = map.getLevel() + 5;
 	map_lat = map.getCenter().getLat();
 	map_lng = map.getCenter().getLng();
-	if(!width) {width = '600'}
-	if(!height) {height = '400'}
+	if(!width) {width = '600';}
+	if(!height) {height = '400';}
 
 	//XE에서 속성 삭제하는 방향으로 바뀐다면, alt 에 넣자
 	var img_var = {
-			'component': 'map_components',
-			'method': 'encode_data',
-			'map_center': map_lat+','+map_lng,
-			'width': width,
-			'height': height,
-			'map_markers': map_marker_positions,
-			'map_zoom': map_zoom
-		};
+		'component': 'map_components',
+		'method': 'encode_data',
+		'map_center': map_lat+','+map_lng,
+		'width': width,
+		'height': height,
+		'map_markers': map_marker_positions,
+		'map_zoom': map_zoom
+	};
 	var img_data = '';
 
-	var response_tags = new Array('error','message','results');
+	var response_tags = ['error','message','results'];
 	exec_xml('editor', 'procEditorCall', img_var, function(ret_obj,b) {
-			var results = ret_obj['results']; img_data = results;
+		var results = ret_obj.results; img_data = results;
 
-			var text = "<img src=\"https://maps-api-ssl.google.com/maps/api/staticmap?center="+map_lat+','+map_lng+"&zoom="+map_zoom+"&size="+width+"x"+height;
-			var positions = map_marker_positions.split(";");
-			for(var i = 0; i < positions.length; i++)
-			{
-				if(!positions[i].trim()) continue;
-				text += "&markers=size:mid|"+positions[i];
-			}
-			text += "&sensor=false\" editor_component=\"map_components\" alt=\""+img_data+"\" style=\"border:2px dotted #FF0033; no-repeat center;width: "+width+"px; height: "+height+"px;\" />";
+		var text = "<img src=\"https://maps-api-ssl.google.com/maps/api/staticmap?center="+map_lat+','+map_lng+"&zoom="+map_zoom+"&size="+width+"x"+height;
+		var positions = map_marker_positions.split(";");
+		for(var i = 0; i < positions.length; i++)
+		{
+			if(!positions[i].trim()) continue;
+			text += "&markers=size:mid|"+positions[i];
+		}
+		text += "&sensor=false\" editor_component=\"map_components\" alt=\""+img_data+"\" style=\"border:2px dotted #FF0033; no-repeat center;width: "+width+"px; height: "+height+"px;\" />";
 
-			opener.editorFocus(opener.editorPrevSrl);
-			var iframe_obj = opener.editorGetIFrame(opener.editorPrevSrl)
-			opener.editorReplaceHTML(iframe_obj, text);
-			opener.editorFocus(opener.editorPrevSrl);
-			window.close();
-		}, response_tags);
+		opener.editorFocus(opener.editorPrevSrl);
+		var iframe_obj = opener.editorGetIFrame(opener.editorPrevSrl);
+		opener.editorReplaceHTML(iframe_obj, text);
+		opener.editorFocus(opener.editorPrevSrl);
+		window.close();
+	}, response_tags);
 
 }
 jQuery(document).ready(function() { getMaps(); });
