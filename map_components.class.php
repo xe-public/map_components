@@ -1,12 +1,5 @@
 <?php
-// 이전에 구글 지도 컴포넌트를 변형해서 (저장 구조도 모두 바꿀 예정) 국내 지도에 잘 대응하는 컴포넌트 만들기 프로젝트.
-/*
-생각해볼 것
-한국인 경우 네이버 또는 다음 지도 사용.
-아닌 경우 구글 지도 사용
-
-한국인지 아닌지는 위도/경도로 구분.... - 필요할까?
-*/
+/* Map Component by MinSoo Kim. (c) 2014-2015 MinSoo Kim. (misol.kr@gmail.com) */
 class map_components extends EditorHandler {
 	var $editor_sequence = '0';
 	var $component_path = '';
@@ -48,10 +41,8 @@ class map_components extends EditorHandler {
 		$this->editor_sequence = $editor_sequence;
 		$this->component_path = $component_path;
 		Context::loadLang($component_path.'lang');
-		if(class_exists('Mobile')) {
-			if(Mobile::isFromMobilePhone()) {
-				$this->mobile_set = true;
-			}
+		if(Mobile::isFromMobilePhone()) {
+			$this->mobile_set = true;
 		}
 		$this->langtype = str_replace($this->xe_langtype, $this->google_langtype, strtolower(Context::getLangType()));
 	}
@@ -424,9 +415,7 @@ class map_components extends EditorHandler {
 			$output .= "&markers=size:mid|".$position;
 		}
 		$output .= "&sensor=false";
-
 		return $output;
 	}
-
 }
 ?>
