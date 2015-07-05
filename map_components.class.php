@@ -34,10 +34,11 @@ class map_components extends EditorHandler {
 			'en', // google does not not support
 			'tr'
 		);
+
 	/**
 	 * @brief editor_sequence과 컴포넌트의 경로를 받음
 	 **/
-	function map_components($editor_sequence, $component_path) {
+	function __construct($editor_sequence, $component_path) {
 		$this->editor_sequence = $editor_sequence;
 		$this->component_path = $component_path;
 		Context::loadLang($component_path.'lang');
@@ -95,8 +96,12 @@ class map_components extends EditorHandler {
 		// API 종류 정하기 다음/네이버/구글
 		if(trim($this->soo_map_api))
 		{
-			if($this->soo_map_api === $this->soo_map_api)
+			if($this->soo_map_api === $this->soo_daum_local_api_key || strlen($this->soo_map_api) === 40)
 			{
+				if(!$this->soo_daum_local_api_key && strlen($this->soo_map_api) === 40)
+				{
+					$this->soo_daum_local_api_key = $this->soo_map_api;
+				}
 				$this->maps_api_type = 'daum';
 			}
 			elseif(strlen($this->soo_map_api) == 32)
@@ -186,7 +191,7 @@ class map_components extends EditorHandler {
 		// API 종류 정하기 다음/네이버/구글
 		if(trim($this->soo_map_api))
 		{
-			if($this->soo_map_api === $this->soo_map_api)
+			if($this->soo_map_api === $this->soo_daum_local_api_key || strlen($this->soo_map_api) === 40)
 			{
 				$this->maps_api_type = 'daum';
 			}
@@ -279,7 +284,7 @@ class map_components extends EditorHandler {
 		// API 종류 정하기 다음/네이버/구글
 		if(trim($this->soo_map_api))
 		{
-			if($this->soo_map_api === $this->soo_map_api)
+			if($this->soo_map_api === $this->soo_daum_local_api_key || strlen($this->soo_map_api) === 40)
 			{
 				$this->maps_api_type = 'daum';
 			}
