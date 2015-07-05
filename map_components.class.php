@@ -411,7 +411,7 @@ class map_components extends EditorHandler {
 				$width = $width.'px';
 			}
 			$height = $height.'px';
-			$view_code = '<span id="ggl_map_canvas'.$map_count.'" style="box-sizing:border-box;width:'.$width.'; height:'.$height.'" class="soo_maps"></span>'.
+			$view_code = '<span id="ggl_map_canvas'.$map_count.'" style="box-sizing:border-box;width:'.$width.';max-width:100%;height:'.$height.'" class="soo_maps"></span>'.
 				'<script>'.
 				'jQuery(window).load(function() { ggl_map_init'.$map_count.'(); });'.
 				'</script>'."\n";
