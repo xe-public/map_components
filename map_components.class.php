@@ -95,7 +95,7 @@ class map_components extends EditorHandler {
 		// API 종류 정하기 다음/네이버/구글
 		if(trim($this->soo_map_api))
 		{
-			if(strlen($this->soo_map_api) == 40)
+			if($this->soo_map_api === $this->soo_map_api)
 			{
 				$this->maps_api_type = 'daum';
 			}
@@ -154,7 +154,7 @@ class map_components extends EditorHandler {
 		}
 
 		if($this->soo_daum_local_api_key) {
-			$uri = sprintf('http://apis.daum.net/local/geo/addr2coord?apikey=%s&q=%s&output=xml',$this->soo_daum_local_api_key,urlencode($address));
+			$uri = sprintf('http://apis.daum.net/local/v1/search/keyword.xml?apikey=%s&query=%s&output=xml',$this->soo_daum_local_api_key,urlencode($address));
 			$xml_doc = $this->xml_api_request($uri);
 
 			$item = $xml_doc->channel->item;
@@ -169,11 +169,10 @@ class map_components extends EditorHandler {
 					$input_obj = $item[$j];
 					if(!$input_obj->title->body) continue;
 					$result[$i]->formatted_address = $input_obj->title->body;
-					$result[$i]->geometry->lng = $input_obj->lng->body;
-					$result[$i]->geometry->lat = $input_obj->lat->body;
+					$result[$i]->geometry->lng = $input_obj->longitude->body;
+					$result[$i]->geometry->lat = $input_obj->latitude->body;
 					$result[$i]->result_from = 'Daum';
 				}
-
 			}
 		}
 		$this->add("results", $result);
@@ -187,7 +186,7 @@ class map_components extends EditorHandler {
 		// API 종류 정하기 다음/네이버/구글
 		if(trim($this->soo_map_api))
 		{
-			if(strlen($this->soo_map_api) == 40)
+			if($this->soo_map_api === $this->soo_map_api)
 			{
 				$this->maps_api_type = 'daum';
 			}
@@ -280,7 +279,7 @@ class map_components extends EditorHandler {
 		// API 종류 정하기 다음/네이버/구글
 		if(trim($this->soo_map_api))
 		{
-			if(strlen($this->soo_map_api) == 40)
+			if($this->soo_map_api === $this->soo_map_api)
 			{
 				$this->maps_api_type = 'daum';
 			}
@@ -391,7 +390,6 @@ class map_components extends EditorHandler {
 
 		Context::addHtmlHeader($header_script);
 
-
 		if(Context::getResponseMethod() != 'HTML') {
 			$style = 'text-align:center; width: 100%; margin:15px 0px;';
 			$view_code .= '<div style="'.$style.'" class="soo_maps"><img src="'.htmlspecialchars($this->getImageMapLink($lat.','.$lng, $map_markers, $zoom, $width, $height)).'" /></div>';
@@ -399,7 +397,16 @@ class map_components extends EditorHandler {
 		} elseif(Context::get('act') == 'dispPageAdminContentModify') {
 			$view_code = sprintf("<img src='%s' width='%d' height='%d' alt='Map Component' />",str_replace('&amp;amp;','&amp;',htmlspecialchars($xml_obj->attrs->src)), $width, $height);
 		} else {
-			$view_code = '<span id="ggl_map_canvas'.$map_count.'" style="width: '.$width.'px; height: '.$height.'px" class="soo_maps"></span>'.
+			if($width == 600)
+			{
+				$width = '100%';
+			}
+			else
+			{
+				$width = $width.'px';
+			}
+			$height = $height.'px';
+			$view_code = '<span id="ggl_map_canvas'.$map_count.'" style="box-sizing:border-box;width:'.$width.'; height:'.$height.'" class="soo_maps"></span>'.
 				'<script>'.
 				'jQuery(window).load(function() { ggl_map_init'.$map_count.'(); });'.
 				'</script>'."\n";

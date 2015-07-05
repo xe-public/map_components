@@ -69,7 +69,7 @@ function complete_search(ret_obj, response_tags, address) {
 	address_adder(results);
 }
 function address_adder(results) {
-	var result_array = [];
+	result_array = [];
 	if(typeof(results.length) == "undefined") results = [results];
 
 	for(var i=0;i<results.length;i++) {
