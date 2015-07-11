@@ -4,22 +4,25 @@
 	<title xml:lang="en">Maps</title>
 	<description xml:lang="ko">지도를 원하는 곳에 추가하거나 수정할 수 있습니다. Google Maps API, 다음 지도 API, 다음 로컬 API 등이 사용되었습니다.</description>
 	<description xml:lang="en">Maps can be inserted in your documents. Google Maps API, Daum Maps API, Daum Local API and some other APIs are included.</description>
-	<version>1.1.4</version>
-	<date>2015-07-05</date>
+	<version>1.1.5</version>
+	<date>2015-07-12</date>
 	<license link="http://www.gnu.org/licenses/gpl-3.0.html">GPLv3</license>
-	<author email_address="misol.kr@gmail.com">
+	<author email_address="misol.kr@gmail.com" link="https://github.com/misol">
 		<name xml:lang="ko">김민수(misol)</name>
 		<name xml:lang="en">MinSoo Kim(misol)</name>
 	</author>
 	<extra_vars>
 		<var name="soo_daum_local_api_key">
-			<title>다음 API REST/JS Key</title>
+			<title xml:lang="ko">다음 API REST/JS Key(선택)</title>
+			<title xml:lang="en">DaumKakao API REST/JS Key(Optional, For Korean maps)</title>
 			<description>https://developers.daum.net/console 에서 앱 만들기 후, API 키 메뉴에서 REST/JS API 키 항목을 통해 웹 브라우저용 API 키를 발급 받으신 키를 입력해주세요.</description>
 		</var>
 		<var name="soo_map_api">
-			<title>지도 API Key</title>
+			<title xml:lang="ko">지도 API Key(선택)</title>
+			<title xml:lang="en">Maps API Key(Optional, For Korean maps)</title>
 			<description>https://developers.daum.net/console 에서 앱 만들기 후, API 키 메뉴에서 REST/JS API 키 항목을 통해 웹 브라우저용 API 키를 발급 받으시거나, https://developer.naver.com/openapi/register.nhn 에서 지도 API 키를 발급받은 후 입력해주세요.
-			다음 지도를 이용하실 경우, 위 다음 API REST/JS Key에서 입력한 키와 동일한 키를 입력하셔야 다음 지도를 이용하실 수 있습니다.</description>
+			다음 지도를 이용하실 경우, 위 다음 API REST/JS Key에서 입력한 키와 동일한 키를 입력하셔야 다음 지도를 이용하실 수 있습니다.
+			아무 값을 입력하지 않을 경우, 구글 지도가 나타납니다.</description>
 		</var>
 	</extra_vars>
 </component>

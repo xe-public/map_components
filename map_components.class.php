@@ -70,7 +70,7 @@ class map_components extends EditorHandler {
 
 		if($height_style[2]) $height = intval(trim($height_style[2]));
 		if(!$height) $height = intval($xml_obj->attrs->height);
-		if(!$height) {$height = 400;}
+		if(!$height) {$height = 300;}
 
 		$this->add("width", $width);
 		$this->add("height", $height);
@@ -318,7 +318,7 @@ class map_components extends EditorHandler {
 
 		if($height_style[2]) $height = intval(trim($height_style[2]));
 		if(!$height) $height = intval($xml_obj->attrs->height);
-		if(!$height) {$height = 400;}
+		if(!$height) {$height = 300;}
 
 		$header_script = '';
 		if($map_count==1) {
@@ -411,15 +411,17 @@ class map_components extends EditorHandler {
 				$width = $width.'px';
 			}
 			$height = $height.'px';
-			$view_code = '<span id="ggl_map_canvas'.$map_count.'" style="box-sizing:border-box;width:'.$width.';max-width:100%;height:'.$height.'" class="soo_maps"></span>'.
-				'<script>'.
-				'jQuery(window).load(function() { ggl_map_init'.$map_count.'(); });'.
-				'</script>'."\n";
+			$view_code = '<span id="ggl_map_canvas'.$map_count.'" style="box-sizing:border-box;width:'.$width.';max-width:100%;height:'.$height.'" class="soo_maps"></span>';
+			// 이미지 리사이징 애드온 등을 회피하기 위해서 가장 마지막에 실행 되도록 함
+			$footer_code = '<script>'.
+				'jQuery(window).load(function() { setTimeout(function(){ ggl_map_init'.$map_count.'(); }, 100); });'.
+				'</script>';
+			Context::addHtmlFooter($footer_code);
 		}
 		return $view_code;
 	}
 
-	function getImageMapLink($center, $markers, $zoom, $width=600, $height=400) {
+	function getImageMapLink($center, $markers, $zoom, $width=600, $height=300) {
 		$output = "https://maps-api-ssl.google.com/maps/api/staticmap?center=".$center."&zoom=".$zoom."&size=".$width."x".$height;
 		$positions = explode(";", $markers);
 		foreach($positions as $position) {

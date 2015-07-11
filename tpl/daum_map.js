@@ -132,7 +132,7 @@ function getMaps() {
 		var center = map.getCenter();
 
 		jQuery("#width").val('600');
-		jQuery("#height").val('400');
+		jQuery("#height").val('300');
 		map.setLevel(map_zoom);
 	}
 
@@ -281,7 +281,7 @@ function insertMap(obj) {
 	map_lat = map.getCenter().getLat();
 	map_lng = map.getCenter().getLng();
 	if(!width) {width = '600';}
-	if(!height) {height = '400';}
+	if(!height) {height = '300';}
 
 	//XE에서 속성 삭제하는 방향으로 바뀐다면, alt 에 넣자
 	var img_var = {
