@@ -6,7 +6,7 @@ body, html {
 	-moz-text-size-adjust: 100%;
 	margin: 0;
 	padding: 0;
-	font-family: '나눔고딕', NanumGothic, Sans-Serif;
+	font-family: '나눔고딕', NanumGothic, '맑은 고딕', Sans-Serif;
 }
 h1 {
 	background-color: #ff3b30;
@@ -67,9 +67,7 @@ address>a, h1>a, #insertAction {
 	opacity:  0 !important;
 }
 input[type=text]  {
-
 	width:  150px!important;
-
 }
 #view_list {
 	margin: 0;
@@ -97,4 +95,53 @@ li.result_lists>a {
 	width: 800px;
 	height: 455px;
 	z-index: 100000;
+}
+div.xe_mobile {
+	display:none !important;
+}
+@media all and (max-width: 700px) {
+	#bodyDiv {
+		margin: 0 auto;
+		padding: 0;
+		width: 100%;
+		height: auto;
+	}
+	#controlArea {
+		box-sizing: border-box;
+		width: 100%;
+		height: 251px;
+		overflow: hidden;
+		float: left;
+	}
+	#map_canvas  {
+		box-sizing: border-box;
+		overflow: visible;
+		width: 100%;
+		height: 230px;
+	}
+	#result_list_layer {
+		overflow-y: scroll;
+		height: 150px;
+	}
+	#insertAction {
+		box-sizing: border-box;
+		display: block;
+		height: 40px;
+		font-size: 15px;
+		text-align: center;
+		background-color: #8e8e93;
+		border: 0;
+	}
+	#insertAction>span {
+		vertical-align: -10px;
+	}
+	#insertAction:hover {
+		background-color: #474749;
+	}
+	#helpDiv, #helpDiv>a, #helpDiv img{
+		display:none!important;
+	}
+	div.popup {
+		max-width: 100%!important;
+	}
 }

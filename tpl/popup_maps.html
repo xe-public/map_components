@@ -4,7 +4,7 @@
 <!--@else--><!--%import("google_map.js")--><!--@end-->
 <!--%import("pop.css")-->
 <!--%import("../lang")-->
-{@Context::addHtmlHeader('<script>var no_result="'.$lang->msg_no_result.'";'.
+{@Context::addHtmlHeader('<meta name="viewport" content="width=device-width, user-scalable=no" /><script>var no_result="'.$lang->msg_no_result.'";'.
 	'var dragmarkertext="'.$lang->soo_drag_marker_text.'";'.
 	'var soo_about_marker="'.$lang->soo_about_marker.'";'.
 	'var soo_langcode="'.$soo_langcode.'";</script>');}
@@ -33,8 +33,8 @@
 	<input type="hidden" id="height" value="" />
 	<div id="helpDiv" style="display:none;">
 		<a href="#" onclick="toggle('helpDiv');return false;">
-		<!--@if(Context::getLangType() == 'ko')--><img src="./modules/editor/components/map_components/tpl/image/help1.ko.png" alt="지도 컴포넌트 도움말 그림. 왼쪽에는 검색 영역이 있고, 오른쪽에는 지도 영역이 있습니다. 오른쪽 지도 영역에서 표시하고 싶은 위치를 클릭해보세요. 표시를 지우고 싶은 영역은 나타난 표시를 다시 클릭해보세요." />
-		<!--@else--><img src="./modules/editor/components/map_components/tpl/image/help1.en.png" alt="Maps component help. Search area on the left, and Map area on the right. Click the map to note a place or reclick to remove a mark." />
+		<!--@if(Context::getLangType() == 'ko')--><img src="./modules/editor/components/map_components/tpl/image/help1.ko.png" alt="{$lang->about_maps_component}" />
+		<!--@else--><img src="./modules/editor/components/map_components/tpl/image/help1.en.png" alt="{$lang->about_maps_component}" />
 		<!--@end-->
 		</a>
 	</div>
