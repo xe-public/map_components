@@ -228,7 +228,7 @@ class map_components extends EditorHandler {
 			$this->map_comp_lat = 37.57;
 			$this->map_comp_lng = 126.98;
 
-			$map_comp_header_script = '<script src="http://openapi.map.naver.com/openapi/naverMap.naver?ver=2.0&amp;key='.$this->soo_map_api.'"></script>';
+			$map_comp_header_script = '<script src="https://openapi.map.naver.com/openapi/naverMap.naver?ver=2.0&amp;key='.$this->soo_map_api.'"></script>';
 			$map_comp_header_script .= '<script>'.
 				sprintf(
 					'var defaultlat="%s";'.
@@ -328,7 +328,7 @@ class map_components extends EditorHandler {
 			}
 			elseif($this->maps_api_type == 'naver')
 			{
-				$header_script .= '<script src="http://openapi.map.naver.com/openapi/naverMap.naver?ver=2.0&amp;key='.$this->soo_map_api.'"></script><style type="text/css">span.soo_maps {display:block;} span.soo_maps img {max-width:none;}span.soo_maps>a>img {max-width:100%;}</style>'."\n";
+				$header_script .= '<script src="https://openapi.map.naver.com/openapi/naverMap.naver?ver=2.0&amp;key='.$this->soo_map_api.'"></script><style type="text/css">span.soo_maps {display:block;} span.soo_maps img {max-width:none;}span.soo_maps>a>img {max-width:100%;}</style>'."\n";
 			}
 			else
 			{
