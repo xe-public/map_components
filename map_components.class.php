@@ -96,9 +96,13 @@ class map_components extends EditorHandler {
 		// API 종류 정하기 다음/네이버/구글
 		if(trim($this->soo_map_api))
 		{
-			if($this->soo_map_api === $this->soo_daum_local_api_key || strlen($this->soo_map_api) === 40)
+			if($this->soo_map_api === $this->soo_daum_local_api_key || strlen($this->soo_map_api) === 40 || (trim($this->soo_map_api_type) === 'daum' && strlen($this->soo_map_api) == 32))
 			{
 				if(!$this->soo_daum_local_api_key && strlen($this->soo_map_api) === 40)
+				{
+					$this->soo_daum_local_api_key = $this->soo_map_api;
+				}
+				elseif(trim($this->soo_map_api_type) === 'daum' && !$this->soo_daum_local_api_key && strlen($this->soo_map_api) == 32)
 				{
 					$this->soo_daum_local_api_key = $this->soo_map_api;
 				}
@@ -113,6 +117,8 @@ class map_components extends EditorHandler {
 				$this->maps_api_type = 'google';
 			}
 		}
+		else
+			$this->maps_api_type = 'google';
 
 		$uri = sprintf('http://maps.googleapis.com/maps/api/geocode/xml?address=%s&sensor=false&language=%s',urlencode($address),urlencode($this->langtype));
 		$xml_doc = $this->xml_api_request($uri);
@@ -191,8 +197,16 @@ class map_components extends EditorHandler {
 		// API 종류 정하기 다음/네이버/구글
 		if(trim($this->soo_map_api))
 		{
-			if($this->soo_map_api === $this->soo_daum_local_api_key || strlen($this->soo_map_api) === 40)
+			if($this->soo_map_api === $this->soo_daum_local_api_key || strlen($this->soo_map_api) === 40 || (trim($this->soo_map_api_type) === 'daum' && strlen($this->soo_map_api) == 32))
 			{
+				if(!$this->soo_daum_local_api_key && strlen($this->soo_map_api) === 40)
+				{
+					$this->soo_daum_local_api_key = $this->soo_map_api;
+				}
+				elseif(trim($this->soo_map_api_type) === 'daum' && !$this->soo_daum_local_api_key && strlen($this->soo_map_api) == 32)
+				{
+					$this->soo_daum_local_api_key = $this->soo_map_api;
+				}
 				$this->maps_api_type = 'daum';
 			}
 			elseif(strlen($this->soo_map_api) == 32)
@@ -204,6 +218,8 @@ class map_components extends EditorHandler {
 				$this->maps_api_type = 'google';
 			}
 		}
+		else
+			$this->maps_api_type = 'google';
 
 		// 다음과 네이버는 국내 지도만 사용가능. 구글은 세계지도.
 		if($this->maps_api_type == 'daum')
@@ -284,8 +300,12 @@ class map_components extends EditorHandler {
 		// API 종류 정하기 다음/네이버/구글
 		if(trim($this->soo_map_api))
 		{
-			if($this->soo_map_api === $this->soo_daum_local_api_key || strlen($this->soo_map_api) === 40)
+			if($this->soo_map_api === $this->soo_daum_local_api_key || strlen($this->soo_map_api) === 40 || (trim($this->soo_map_api_type) === 'daum' && strlen($this->soo_map_api) == 32))
 			{
+				if((!$this->soo_daum_local_api_key && strlen($this->soo_map_api) === 40) || (trim($this->soo_map_api_type) === 'daum' && !$this->soo_daum_local_api_key && strlen($this->soo_map_api) == 32))
+				{
+					$this->soo_daum_local_api_key = $this->soo_map_api;
+				}
 				$this->maps_api_type = 'daum';
 			}
 			elseif(strlen($this->soo_map_api) == 32)
@@ -297,6 +317,8 @@ class map_components extends EditorHandler {
 				$this->maps_api_type = 'google';
 			}
 		}
+		else
+			$this->maps_api_type = 'google';
 
 		//한 페이지 내에 지도 수
 		$map_count = Context::get('pub_maps_count');

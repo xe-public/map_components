@@ -4,8 +4,8 @@
 	<title xml:lang="en">Maps</title>
 	<description xml:lang="ko">지도를 원하는 곳에 추가하거나 수정할 수 있습니다. Google Maps API, 다음 지도 API, 다음 로컬 API 등이 사용되었습니다.</description>
 	<description xml:lang="en">Maps can be inserted in your documents. Google Maps API, Daum Maps API, Daum Local API and some other APIs are included.</description>
-	<version>1.2</version>
-	<date>2015-07-14</date>
+	<version>1.2.1</version>
+	<date>2015-09-21</date>
 	<license link="http://www.gnu.org/licenses/gpl-3.0.html">GPLv3</license>
 	<author email_address="misol.kr@gmail.com" link="https://github.com/misol">
 		<name xml:lang="ko">김민수(misol)</name>
@@ -13,16 +13,29 @@
 	</author>
 	<extra_vars>
 		<var name="soo_daum_local_api_key">
-			<title xml:lang="ko">다음 API REST/JS Key(선택)</title>
-			<title xml:lang="en">DaumKakao API REST/JS Key(Optional, For Korean maps)</title>
+			<title xml:lang="ko">다음 API REST/JS Key(선택, 다음 지도를 사용할 경우 필수)</title>
+			<title xml:lang="en">DaumKakao API REST/JS Key (Optional, For Korean maps)</title>
 			<description>https://developers.daum.net/console 에서 앱 만들기 후, API 키 메뉴에서 REST/JS API 키 항목을 통해 웹 브라우저용 API 키를 발급 받으신 키를 입력해주세요.</description>
 		</var>
 		<var name="soo_map_api">
 			<title xml:lang="ko">지도 API Key(선택)</title>
-			<title xml:lang="en">Maps API Key(Optional, For Korean maps)</title>
+			<title xml:lang="en">Maps API Key (Optional, For Korean maps)</title>
 			<description>https://developers.daum.net/console 에서 앱 만들기 후, API 키 메뉴에서 REST/JS API 키 항목을 통해 웹 브라우저용 API 키를 발급 받으시거나, https://developer.naver.com/openapi/register.nhn 에서 지도 API 키를 발급받은 후 입력해주세요.
 			다음 지도를 이용하실 경우, 위 다음 API REST/JS Key에서 입력한 키와 동일한 키를 입력하셔야 다음 지도를 이용하실 수 있습니다.
 			아무 값을 입력하지 않을 경우, 구글 지도가 나타납니다.</description>
+		</var>
+		<var name="soo_map_api_type" type="select">
+			<title xml:lang="ko">지도 API Key 발급자(다음, 네이버 API 사용시 권장)</title>
+			<title xml:lang="en">Maps API Key Distributors (Recommand, For Korean maps)</title>
+			<description>다음 지도 API Key 가 32자 인 경우 반드시 선택해주시기 바랍니다.</description>
+			<options value="">
+				<title xml:lang="ko">자동 선택(다음 지도 아님)</title>
+				<title xml:lang="en">Auto selection (Not Daum Maps)</title>
+			</options>
+			<options value="daum">
+				<title xml:lang="ko">다음</title>
+				<title xml:lang="en">Daum</title>
+			</options>
 		</var>
 	</extra_vars>
 </component>
