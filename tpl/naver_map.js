@@ -95,7 +95,7 @@ function address_adder(results) {
 }
 
 function getMaps() {
-	oIcon = new nhn.api.map.Icon('http://static.naver.com/maps2/icons/pin_spot2.png', new nhn.api.map.Size(28, 37), new nhn.api.map.Size(14, 37));
+	oIcon = new nhn.api.map.Icon(request_uri + './modules/editor/components/map_components/front/images/marker.png', new nhn.api.map.Size(31, 36), new nhn.api.map.Size(15.5, 36));
 
 	var node;
 	var mapOption = {

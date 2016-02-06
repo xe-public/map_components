@@ -108,7 +108,7 @@ class map_components extends EditorHandler {
 				}
 				$this->maps_api_type = 'daum';
 			}
-			elseif(strlen($this->soo_map_api) == 32)
+			elseif(strlen($this->soo_map_api) == 32 || strlen($this->soo_map_api) == 20)
 			{
 				$this->maps_api_type = 'naver';
 			}
@@ -209,7 +209,7 @@ class map_components extends EditorHandler {
 				}
 				$this->maps_api_type = 'daum';
 			}
-			elseif(strlen($this->soo_map_api) == 32)
+			elseif(strlen($this->soo_map_api) == 32 || strlen($this->soo_map_api) == 20)
 			{
 				$this->maps_api_type = 'naver';
 			}
@@ -244,7 +244,7 @@ class map_components extends EditorHandler {
 			$this->map_comp_lat = 37.57;
 			$this->map_comp_lng = 126.98;
 
-			$map_comp_header_script = '<script src="https://openapi.map.naver.com/openapi/naverMap.naver?ver=2.0&amp;key='.$this->soo_map_api.'"></script>';
+			$map_comp_header_script = '<script src="https://openapi.map.naver.com/openapi/v2/maps.js?clientId='.$this->soo_map_api.'"></script>';
 			$map_comp_header_script .= '<script>'.
 				sprintf(
 					'var defaultlat="%s";'.
@@ -308,7 +308,7 @@ class map_components extends EditorHandler {
 				}
 				$this->maps_api_type = 'daum';
 			}
-			elseif(strlen($this->soo_map_api) == 32)
+			elseif(strlen($this->soo_map_api) == 32 || strlen($this->soo_map_api) == 20)
 			{
 				$this->maps_api_type = 'naver';
 			}
@@ -346,15 +346,15 @@ class map_components extends EditorHandler {
 		if($map_count==1) {
 			if($this->maps_api_type == 'daum')
 			{
-				$header_script .= '<script src="https://apis.daum.net/maps/maps3.js?apikey='.$this->soo_map_api.'"></script><style type="text/css">span.soo_maps {display:block;} span.soo_maps img {max-width:none;}span.soo_maps>a>img {max-width:100%;}</style>'."\n";
+				$header_script .= '<script src="https://apis.daum.net/maps/maps3.js?apikey='.$this->soo_map_api.'"></script><script>var ggl_map = [],map_component_user_position = "' . $this->soo_user_position . '";</script><style>div.soo_maps{display:block;position:relative;} div.soo_maps img{max-width:none;}div.soo_maps>a>img{max-width:100%;}</style>'."\n";
 			}
 			elseif($this->maps_api_type == 'naver')
 			{
-				$header_script .= '<script src="https://openapi.map.naver.com/openapi/naverMap.naver?ver=2.0&amp;key='.$this->soo_map_api.'"></script><style type="text/css">span.soo_maps {display:block;} span.soo_maps img {max-width:none;}span.soo_maps>a>img {max-width:100%;}</style>'."\n";
+				$header_script .= '<script src="https://openapi.map.naver.com/openapi/v2/maps.js?clientId='.$this->soo_map_api.'"></script><script>var ggl_map = [],map_component_user_position = "' . $this->soo_user_position . '";</script><style>div.soo_maps {display:block;position:relative;} div.soo_maps img {max-width:none;}div.soo_maps>a>img {max-width:100%;}</style>'."\n";
 			}
 			else
 			{
-				$header_script .= '<script src="https://maps-api-ssl.google.com/maps/api/js?sensor=false&amp;language='.$this->langtype.'"></script><style type="text/css">.gmnoprint div[title^="Pan"],.gmnoprint div[title~="이동"] {opacity: 0 !important;}span.soo_maps {display:block;} span.soo_maps img {max-width:none;}span.soo_maps>a>img {max-width:100%;}</style>'."\n";
+				$header_script .= '<script src="https://maps-api-ssl.google.com/maps/api/js?sensor=false&amp;language='.$this->langtype.'"></script><script>var ggl_map = [],map_component_user_position = "' . $this->soo_user_position . '";</script><style>.gmnoprint div[title^="Pan"],.gmnoprint div[title~="이동"] {opacity: 0 !important;}div.soo_maps {display:block;position:relative;} div.soo_maps img {max-width:none;}div.soo_maps>a>img {max-width:100%;}</style>'."\n";
 			}
 			
 		}
@@ -369,6 +369,7 @@ class map_components extends EditorHandler {
 		$map_markers = preg_replace('/[^0-9\.\,\;]+/i', '', $map_markers);
 
 		$zoom = intval(trim($data->map_zoom));
+		$this->soo_user_position = ($this->soo_user_position === 'Y') ? 'Y' : 'N';
 
 		if($this->maps_api_type == 'daum')
 		{
@@ -376,14 +377,14 @@ class map_components extends EditorHandler {
 			Context::loadFile(array('./modules/editor/components/map_components/front/js/daum_maps.js', 'head', '', null), true);
 			$header_script .= '<script>'.
 				'function ggl_map_init'.$map_count.'() {'.
-					'var mapOption = { level: '.$zoom.', center: new daum.maps.LatLng('.$lat.', '.$lng.') };'.
+					'var mapOption = { center: new daum.maps.LatLng('.$lat.', '.$lng.'), level: '.$zoom.' };'.
 					'var marker_points = "'.$map_markers.'";'.
-					'var ggl_map'.$map_count.' = new daum.maps.Map(document.getElementById("ggl_map_canvas'.$map_count.'"), mapOption);'.
+					'ggl_map['.$map_count.'] = new daum.maps.Map(document.getElementById("ggl_map_canvas'.$map_count.'"), mapOption);'.
 					'var zoomControl = new daum.maps.ZoomControl();'.
-					'ggl_map'.$map_count.'.addControl(zoomControl, daum.maps.ControlPosition.LEFT);'.
+					'ggl_map['.$map_count.'].addControl(zoomControl, daum.maps.ControlPosition.LEFT);'.
 					'var mapTypeControl = new daum.maps.MapTypeControl();'.
-					'ggl_map'.$map_count.'.addControl(mapTypeControl, daum.maps.ControlPosition.TOPRIGHT);'.
-					'addMarker(ggl_map'.$map_count.',marker_points)}</script>';
+					'ggl_map['.$map_count.'].addControl(mapTypeControl, daum.maps.ControlPosition.TOPRIGHT);'.
+					'addMarker(ggl_map['.$map_count.'],marker_points)}</script>';
 			$zoom = intval(20-$zoom);
 		}
 		elseif($this->maps_api_type == 'naver')
@@ -394,14 +395,14 @@ class map_components extends EditorHandler {
 				'function ggl_map_init'.$map_count.'() {'.
 					'var mapOption = { zoom: '.$zoom.', point: new nhn.api.map.LatLng('.$lat.', '.$lng.'), enableWheelZoom : true, enableDragPan : true, enableDblClickZoom : true, mapMode : 0, activateTrafficMap : false, activateBicycleMap : false, };'.
 					'var marker_points = "'.$map_markers.'";'.
-					'var ggl_map'.$map_count.' = new nhn.api.map.Map("ggl_map_canvas'.$map_count.'", mapOption);'.
+					'ggl_map['.$map_count.'] = new nhn.api.map.Map("ggl_map_canvas'.$map_count.'", mapOption);'.
 					'var zoomControl = new nhn.api.map.ZoomControl();'.
-					'ggl_map'.$map_count.'.addControl(zoomControl);'.
+					'ggl_map['.$map_count.'].addControl(zoomControl);'.
 					'zoomControl.setPosition({ top : 10, left : 10 });'.
 					'var mapTypeControl = new nhn.api.map.MapTypeBtn();'.
-					'ggl_map'.$map_count.'.addControl(mapTypeControl);'.
+					'ggl_map['.$map_count.'].addControl(mapTypeControl);'.
 					'mapTypeControl.setPosition({ top : 10, right : 10 });'.
-					'addMarker(ggl_map'.$map_count.',marker_points)}</script>';
+					'addMarker(ggl_map['.$map_count.'],marker_points)}</script>';
 			$zoom = intval($zoom)+5;
 		}
 		else
@@ -411,8 +412,8 @@ class map_components extends EditorHandler {
 				'function ggl_map_init'.$map_count.'() {'.
 					'var mapOption = { zoom: '.$zoom.', mapTypeId: google.maps.MapTypeId.ROADMAP, center: new google.maps.LatLng('.$lat.', '.$lng.'), mapTypeControl: true, mapTypeControlOptions: { style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR, position: google.maps.ControlPosition.TOP_RIGHT }, panControl: false, zoomControl: true, zoomControlOptions: { style: google.maps.ZoomControlStyle.LARGE, position: google.maps.ControlPosition.LEFT_CENTER }, scaleControl: false, streetViewControl: false};'.
 					'var marker_points = "'.$map_markers.'";'.
-					'var ggl_map'.$map_count.' = new google.maps.Map(document.getElementById("ggl_map_canvas'.$map_count.'"), mapOption);'.
-					'addMarker(ggl_map'.$map_count.',marker_points)}</script>';
+					'ggl_map['.$map_count.'] = new google.maps.Map(document.getElementById("ggl_map_canvas'.$map_count.'"), mapOption);'.
+					'addMarker(ggl_map['.$map_count.'],marker_points)}</script>';
 		}
 
 		Context::addHtmlHeader($header_script);
@@ -433,7 +434,7 @@ class map_components extends EditorHandler {
 				$width = $width.'px';
 			}
 			$height = $height.'px';
-			$view_code = '<span id="ggl_map_canvas'.$map_count.'" style="box-sizing:border-box;width:'.$width.';max-width:100%;height:'.$height.'" class="soo_maps"></span>';
+			$view_code = '<div id="ggl_map_canvas'.$map_count.'" style="box-sizing:border-box;width:'.$width.';max-width:100%;height:'.$height.'" class="soo_maps"></div>';
 			// 이미지 리사이징 애드온 등을 회피하기 위해서 가장 마지막에 실행 되도록 함
 			$footer_code = '<script>'.
 				'jQuery(window).load(function() { setTimeout(function(){ ggl_map_init'.$map_count.'(); }, 100); });'.
