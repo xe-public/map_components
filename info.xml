@@ -17,10 +17,15 @@
 			<title xml:lang="en">DaumKakao API REST/JS Key (Optional, For Korean maps)</title>
 			<description>https://developers.daum.net/console 에서 앱 만들기 후, API 키 메뉴에서 REST/JS API 키 항목을 통해 웹 브라우저용 API 키를 발급 받으신 키를 입력해주세요.</description>
 		</var>
+		<var name="soo_naver_secret_key">
+			<title xml:lang="ko">Client Secret(선택. 네이버 지도의 경우)</title>
+			<title xml:lang="en">Client Secret (Optional, For Naver maps)</title>
+			<description>https://developers.naver.com/appinfo 에서 앱 등록 후 Client Secret 키를 발급받은 후 입력해주세요.</description>
+		</var>
 		<var name="soo_map_api">
-			<title xml:lang="ko">지도 API Key(선택)</title>
+			<title xml:lang="ko">지도 API Key(선택. 네이버 지도의 경우 Client ID)</title>
 			<title xml:lang="en">Maps API Key (Optional, For Korean maps)</title>
-			<description>https://developers.daum.net/console 에서 앱 만들기 후, API 키 메뉴에서 REST/JS API 키 항목을 통해 웹 브라우저용 API 키를 발급 받으시거나, https://developer.naver.com/openapi/register.nhn 에서 지도 API 키를 발급받은 후 입력해주세요.
+			<description>https://developers.daum.net/console 에서 앱 만들기 후, API 키 메뉴에서 REST/JS API 키 항목을 통해 웹 브라우저용 API 키를 발급 받으시거나, https://developers.naver.com/appinfo 에서 Client ID 키를 발급받은 후 입력해주세요.
 			다음 지도를 이용하실 경우, 위 다음 API REST/JS Key에서 입력한 키와 동일한 키를 입력하셔야 다음 지도를 이용하실 수 있습니다.
 			아무 값을 입력하지 않을 경우, 구글 지도가 나타납니다.</description>
 		</var>

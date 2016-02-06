@@ -78,8 +78,12 @@ class map_components extends EditorHandler {
 	}
 
 	function xml_api_request($uri, $headers = null) {
+		$request_config = array(
+			'ssl_verify_peer' => FALSE,
+			'ssl_verify_host' => FALSE
+		);
 		$xml = '';
-		$xml = FileHandler::getRemoteResource($uri, null, 3, 'GET', 'application/xml', $headers);
+		$xml = FileHandler::getRemoteResource($uri, null, 3, 'GET', 'application/xml', $headers, array(), array(), $request_config);
 
 		$xml = preg_replace("/<\?xml([.^>]*)\?>/i", "", $xml);
 
@@ -141,13 +145,16 @@ class map_components extends EditorHandler {
 		}
 
 		if($this->maps_api_type == 'naver') {
-			$uri = sprintf('http://map.naver.com/api/geocode.php?key=%s&encoding=utf-8&coord=latlng&query=%s',$this->soo_map_api,urlencode($address));
-			$xml_doc = $this->xml_api_request($uri);
+			$uri = sprintf('https://openapi.naver.com/v1/map/geocode?key=%s&encoding=utf-8&output=xml&coord=latlng&query=%s',$this->soo_map_api,urlencode($address));
+			$header = array(
+				'X-Naver-Client-Id' => $this->soo_map_api,
+				'X-Naver-Client-Secret' => $this->soo_naver_secret_key
+			);
+			$xml_doc = $this->xml_api_request($uri, $header);
 
-			$item = $xml_doc->geocode->item;
+			$item = $xml_doc->result->items->item;
 			if(!is_array($item)) $item = array($item);
 			$item_count = count($item);
-
 			if($item_count > 0) {
 				$result_orgin_count = count($result);
 				for($i=$result_orgin_count;($i-$result_orgin_count)<$item_count;$i++) {
@@ -155,7 +162,7 @@ class map_components extends EditorHandler {
 					$j = $i-$result_orgin_count;
 					$input_obj = $item[$j];
 					if(!$input_obj->address->body) continue;
-					$result[$i]->formatted_address = $input_obj->address->body;
+					$result[$i]->formatted_address = str_replace('  ', ' ', trim($input_obj->address->body));
 					$result[$i]->geometry->lng = $input_obj->point->x->body;
 					$result[$i]->geometry->lat = $input_obj->point->y->body;
 					$result[$i]->result_from = 'Naver';
