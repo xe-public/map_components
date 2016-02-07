@@ -68,7 +68,7 @@ jQuery(document).ready(function() {
 		if ("geolocation" in navigator) {
 			var geo_options = {
 				enableHighAccuracy: true,
-				maximumAge        : 30000,
+				maximumAge        : 0,
 				timeout           : 27000
 			};
 
