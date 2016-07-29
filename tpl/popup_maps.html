@@ -1,7 +1,8 @@
 {@Context::setBrowserTitle($component_info->title);}
 <!--@if($maps_api_type == 'naver')--><!--%import("naver_map.js")-->
 <!--@elseif($maps_api_type == 'daum')--><!--%import("daum_map.js")-->
-<!--@else--><!--%import("google_map.js")--><!--@end-->
+<!--@elseif($maps_api_type == 'google')--><!--%import("google_map.js")-->
+<!--@else--><!--%import("../front/leaflet/leaflet.js")--><!--%import("../front/leaflet/leaflet.css")--><!--%import("leaflet.js")--><!--@end-->
 <!--%import("pop.css")-->
 <!--%import("../lang")-->
 {@Context::addHtmlHeader('<meta name="viewport" content="width=device-width, user-scalable=no" /><script>var no_result="'.$lang->msg_no_result.'";'.

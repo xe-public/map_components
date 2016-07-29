@@ -48,6 +48,37 @@ class map_components extends EditorHandler {
 		$this->langtype = str_replace($this->xe_langtype, $this->google_langtype, strtolower(Context::getLangType()));
 	}
 
+	private function getApiHost($api_key) {
+		// API 종류 정하기 다음/네이버/구글
+		if(trim($api_key))
+		{
+			if($api_key === $this->soo_daum_local_api_key || strlen($api_key) === 40 || (trim($this->soo_map_api_type) === 'daum' && strlen($api_key) == 32))
+			{
+				if(!$this->soo_daum_local_api_key && strlen($api_key) === 40)
+				{
+					$this->soo_daum_local_api_key = $api_key;
+				}
+				elseif(trim($this->soo_map_api_type) === 'daum' && !$this->soo_daum_local_api_key && strlen($api_key) == 32)
+				{
+					$this->soo_daum_local_api_key = $api_key;
+				}
+				$this->maps_api_type = 'daum';
+			}
+			elseif(strlen($api_key) == 32 || strlen($api_key) == 20)
+			{
+				$this->maps_api_type = 'naver';
+			}
+			else
+			{
+				$this->maps_api_type = 'google';
+			}
+		}
+		else
+			$this->maps_api_type = 'leaflet';
+
+		return $this->maps_api_type;
+	}
+
 	function encode_data() {
 		$data = Context::gets('map_center', 'width', 'height', 'map_markers', 'map_zoom');
 		if(!$data) return;
@@ -98,31 +129,7 @@ class map_components extends EditorHandler {
 		if(!$address) return;
 
 		// API 종류 정하기 다음/네이버/구글
-		if(trim($this->soo_map_api))
-		{
-			if($this->soo_map_api === $this->soo_daum_local_api_key || strlen($this->soo_map_api) === 40 || (trim($this->soo_map_api_type) === 'daum' && strlen($this->soo_map_api) == 32))
-			{
-				if(!$this->soo_daum_local_api_key && strlen($this->soo_map_api) === 40)
-				{
-					$this->soo_daum_local_api_key = $this->soo_map_api;
-				}
-				elseif(trim($this->soo_map_api_type) === 'daum' && !$this->soo_daum_local_api_key && strlen($this->soo_map_api) == 32)
-				{
-					$this->soo_daum_local_api_key = $this->soo_map_api;
-				}
-				$this->maps_api_type = 'daum';
-			}
-			elseif(strlen($this->soo_map_api) == 32 || strlen($this->soo_map_api) == 20)
-			{
-				$this->maps_api_type = 'naver';
-			}
-			else
-			{
-				$this->maps_api_type = 'google';
-			}
-		}
-		else
-			$this->maps_api_type = 'google';
+		$this->maps_api_type = $this->getApiHost($this->soo_map_api);
 
 		$uri = sprintf('http://maps.googleapis.com/maps/api/geocode/xml?address=%s&sensor=false&language=%s',urlencode($address),urlencode($this->langtype));
 		$xml_doc = $this->xml_api_request($uri);
@@ -202,31 +209,7 @@ class map_components extends EditorHandler {
 		$tpl_file = 'popup_maps.html';
 
 		// API 종류 정하기 다음/네이버/구글
-		if(trim($this->soo_map_api))
-		{
-			if($this->soo_map_api === $this->soo_daum_local_api_key || strlen($this->soo_map_api) === 40 || (trim($this->soo_map_api_type) === 'daum' && strlen($this->soo_map_api) == 32))
-			{
-				if(!$this->soo_daum_local_api_key && strlen($this->soo_map_api) === 40)
-				{
-					$this->soo_daum_local_api_key = $this->soo_map_api;
-				}
-				elseif(trim($this->soo_map_api_type) === 'daum' && !$this->soo_daum_local_api_key && strlen($this->soo_map_api) == 32)
-				{
-					$this->soo_daum_local_api_key = $this->soo_map_api;
-				}
-				$this->maps_api_type = 'daum';
-			}
-			elseif(strlen($this->soo_map_api) == 32 || strlen($this->soo_map_api) == 20)
-			{
-				$this->maps_api_type = 'naver';
-			}
-			else
-			{
-				$this->maps_api_type = 'google';
-			}
-		}
-		else
-			$this->maps_api_type = 'google';
+		$this->maps_api_type = $this->getApiHost($this->soo_map_api);
 
 		// 다음과 네이버는 국내 지도만 사용가능. 구글은 세계지도.
 		if($this->maps_api_type == 'daum')
@@ -237,8 +220,8 @@ class map_components extends EditorHandler {
 			$map_comp_header_script = '<script src="https://apis.daum.net/maps/maps3.js?apikey='.$this->soo_map_api.'"></script>';
 			$map_comp_header_script .= '<script>'.
 				sprintf(
-					'var defaultlat="%s";'.
-					'var defaultlng="%s";'
+					'var defaultlat = "%s";'.
+					'var defaultlng = "%s";'
 					,$this->map_comp_lat,$this->map_comp_lng).
 				'</script>';
 			Context::set('soo_langcode', 'ko');
@@ -254,13 +237,43 @@ class map_components extends EditorHandler {
 			$map_comp_header_script = '<script src="https://openapi.map.naver.com/openapi/v2/maps.js?clientId='.$this->soo_map_api.'"></script>';
 			$map_comp_header_script .= '<script>'.
 				sprintf(
-					'var defaultlat="%s";'.
-					'var defaultlng="%s";'
+					'var defaultlat = "%s";'.
+					'var defaultlng = "%s";'
 					,$this->map_comp_lat,$this->map_comp_lng).
 				'</script>';
 			Context::set('soo_langcode', 'ko');
 			Context::set('maps_api_type', $this->maps_api_type);
 			Context::set('tpl_path', $tpl_path);
+			Context::addHtmlHeader($map_comp_header_script);
+		}
+		elseif($this->maps_api_type == 'google')
+		{
+			if(Context::getLangType() == 'ko') // Seoul
+			{
+				$this->map_comp_lat = 37.57;
+				$this->map_comp_lng = 126.98;
+			}
+			elseif(Context::getLangType() == 'zh-CN' || Context::getLangType() == 'zh-TW') // Beijing
+			{
+				$this->map_comp_lat = 39.55;
+				$this->map_comp_lng = 116.23;
+			}
+			else // United States
+			{
+				$this->map_comp_lat = 38;
+				$this->map_comp_lng = -97;
+			}
+
+			$map_comp_header_script = '<script src="https://maps.googleapis.com/maps/api/js?key=' . $this->soo_map_api . '&amp;language='.$this->langtype.'"></script>';
+			$map_comp_header_script .= '<script>'.
+				sprintf(
+					'var defaultlat="%s";'.
+					'var defaultlng="%s";'
+					,$this->map_comp_lat,$this->map_comp_lng).
+				'</script>';
+			Context::set('soo_langcode',$this->langtype);
+			Context::set('tpl_path', $tpl_path);
+			Context::set('maps_api_type', $this->maps_api_type);
 			Context::addHtmlHeader($map_comp_header_script);
 		}
 		else
@@ -281,11 +294,11 @@ class map_components extends EditorHandler {
 				$this->map_comp_lng = -97;
 			}
 
-			$map_comp_header_script = '<script src="https://maps-api-ssl.google.com/maps/api/js?sensor=false&amp;language='.$this->langtype.'"></script>';
+			$map_comp_header_script = '';
 			$map_comp_header_script .= '<script>'.
 				sprintf(
-					'var defaultlat="%s";'.
-					'var defaultlng="%s";'
+					'var defaultlat = %s;'.
+					'var defaultlng = %s;'
 					,$this->map_comp_lat,$this->map_comp_lng).
 				'</script>';
 			Context::set('soo_langcode',$this->langtype);
@@ -305,27 +318,7 @@ class map_components extends EditorHandler {
 	 **/
 	function transHTML($xml_obj) {
 		// API 종류 정하기 다음/네이버/구글
-		if(trim($this->soo_map_api))
-		{
-			if($this->soo_map_api === $this->soo_daum_local_api_key || strlen($this->soo_map_api) === 40 || (trim($this->soo_map_api_type) === 'daum' && strlen($this->soo_map_api) == 32))
-			{
-				if((!$this->soo_daum_local_api_key && strlen($this->soo_map_api) === 40) || (trim($this->soo_map_api_type) === 'daum' && !$this->soo_daum_local_api_key && strlen($this->soo_map_api) == 32))
-				{
-					$this->soo_daum_local_api_key = $this->soo_map_api;
-				}
-				$this->maps_api_type = 'daum';
-			}
-			elseif(strlen($this->soo_map_api) == 32 || strlen($this->soo_map_api) == 20)
-			{
-				$this->maps_api_type = 'naver';
-			}
-			else
-			{
-				$this->maps_api_type = 'google';
-			}
-		}
-		else
-			$this->maps_api_type = 'google';
+		$this->maps_api_type = $this->getApiHost($this->soo_map_api);
 
 		//한 페이지 내에 지도 수
 		$map_count = Context::get('pub_maps_count');
@@ -359,9 +352,13 @@ class map_components extends EditorHandler {
 			{
 				$header_script .= '<script src="https://openapi.map.naver.com/openapi/v2/maps.js?clientId='.$this->soo_map_api.'"></script><script>var ggl_map = [],map_component_user_position = "' . $this->soo_user_position . '";</script><style>div.soo_maps {display:block;position:relative;} div.soo_maps img {max-width:none;}div.soo_maps>a>img {max-width:100%;}</style>'."\n";
 			}
+			elseif($this->maps_api_type == 'google')
+			{
+				$header_script .= '<script src="https://maps.googleapis.com/maps/api/js?key=' . $this->soo_map_api . '&amp;language='.$this->langtype.'"></script><script>var ggl_map = [],map_component_user_position = "' . $this->soo_user_position . '";</script><style>.gmnoprint div[title^="Pan"],.gmnoprint div[title~="이동"] {opacity: 0 !important;}div.soo_maps {display:block;position:relative;} div.soo_maps img {max-width:none;}div.soo_maps>a>img {max-width:100%;}</style>'."\n";
+			}
 			else
 			{
-				$header_script .= '<script src="https://maps-api-ssl.google.com/maps/api/js?sensor=false&amp;language='.$this->langtype.'"></script><script>var ggl_map = [],map_component_user_position = "' . $this->soo_user_position . '";</script><style>.gmnoprint div[title^="Pan"],.gmnoprint div[title~="이동"] {opacity: 0 !important;}div.soo_maps {display:block;position:relative;} div.soo_maps img {max-width:none;}div.soo_maps>a>img {max-width:100%;}</style>'."\n";
+				$header_script .= '<script>var ggl_map = [],map_component_user_position = "' . $this->soo_user_position . '";</script><style>.gmnoprint div[title^="Pan"],.gmnoprint div[title~="이동"] {opacity: 0 !important;}div.soo_maps {display:block;position:relative;} div.soo_maps img {max-width:none;}div.soo_maps>a>img {max-width:100%;}</style>'."\n";
 			}
 			
 		}
@@ -412,7 +409,7 @@ class map_components extends EditorHandler {
 					'addMarker(ggl_map['.$map_count.'],marker_points)}</script>';
 			$zoom = intval($zoom)+5;
 		}
-		else
+		elseif($this->maps_api_type == 'google')
 		{
 			Context::loadFile(array('./modules/editor/components/map_components/front/js/google_maps.js', 'head', '', null), true);
 			$header_script .= '<script>'.
@@ -421,6 +418,21 @@ class map_components extends EditorHandler {
 					'var marker_points = "'.$map_markers.'";'.
 					'ggl_map['.$map_count.'] = new google.maps.Map(document.getElementById("ggl_map_canvas'.$map_count.'"), mapOption);'.
 					'addMarker(ggl_map['.$map_count.'],marker_points)}</script>';
+		}
+		else
+		{
+			Context::loadFile(array('./modules/editor/components/map_components/front/leaflet/leaflet.js', 'head', '', null), true);
+			Context::loadFile(array('./modules/editor/components/map_components/front/leaflet/leaflet.css', '', '', null), true);
+			Context::loadFile(array('./modules/editor/components/map_components/front/js/leaflets.js', 'head', '', null), true);
+			$header_script .= '<script>'.
+				'function ggl_map_init'.$map_count.'() {'.
+					'var mapOption = { zoom: ' . $zoom . ', center: new L.latLng('.$lat.', '.$lng.'), layers: L.tileLayer(randomTile(), {attribution: \'Map data &copy; <a target="_blank" href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a target="_blank" href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>\'})};'.
+					'var marker_points = "'.$map_markers.'";'.
+					'ggl_map['.$map_count.'] = new L.map(document.getElementById("ggl_map_canvas'.$map_count.'"), mapOption);'.
+					'ggl_map['.$map_count.'].setZoom(' . $zoom . ');'.
+					'L.control.scale().addTo(ggl_map['.$map_count.']);'.
+					'addMarker(ggl_map['.$map_count.'],marker_points)}</script>';
+
 		}
 
 		Context::addHtmlHeader($header_script);
@@ -441,7 +453,7 @@ class map_components extends EditorHandler {
 				$width = $width.'px';
 			}
 			$height = $height.'px';
-			$view_code = '<div id="ggl_map_canvas'.$map_count.'" style="box-sizing:border-box;width:'.$width.';max-width:100%;height:'.$height.'" class="soo_maps"></div>';
+			$view_code = '<div id="ggl_map_canvas'.$map_count.'" style="position:relative;overflow:hidden;box-sizing:border-box;width:'.$width.';max-width:100%;height:'.$height.'" class="soo_maps"></div>';
 			// 이미지 리사이징 애드온 등을 회피하기 위해서 가장 마지막에 실행 되도록 함
 			$footer_code = '<script>'.
 				'jQuery(window).load(function() { setTimeout(function(){ ggl_map_init'.$map_count.'(); }, 100); });'.

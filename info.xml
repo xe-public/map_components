@@ -4,8 +4,8 @@
 	<title xml:lang="en">Maps</title>
 	<description xml:lang="ko">지도를 원하는 곳에 추가하거나 수정할 수 있습니다. Google Maps API, 다음 지도 API, 다음 로컬 API 등이 사용되었습니다.</description>
 	<description xml:lang="en">Maps can be inserted in your documents. Google Maps API, Daum Maps API, Daum Local API and some other APIs are included.</description>
-	<version>1.3</version>
-	<date>2016-02-07</date>
+	<version>1.4</version>
+	<date>2016-07-30</date>
 	<license link="http://www.gnu.org/licenses/gpl-3.0.html">GPLv3</license>
 	<author email_address="misol.kr@gmail.com" link="https://github.com/misol">
 		<name xml:lang="ko">김민수(misol)</name>
@@ -34,12 +34,16 @@
 			<title xml:lang="en">Maps API Key Distributors (Recommand, For Korean maps)</title>
 			<description>다음 지도 API Key 가 32자 인 경우 반드시 선택해주시기 바랍니다.</description>
 			<options value="">
-				<title xml:lang="ko">자동 선택(다음 지도 아님)</title>
-				<title xml:lang="en">Auto selection (Not Daum Maps)</title>
+				<title xml:lang="ko">자동 선택(다음 또는 구글 지도 아님)</title>
+				<title xml:lang="en">Auto selection (Not Daum or Google Maps)</title>
 			</options>
 			<options value="daum">
 				<title xml:lang="ko">다음</title>
 				<title xml:lang="en">Daum</title>
+			</options>
+			<options value="google">
+				<title xml:lang="ko">구글</title>
+				<title xml:lang="en">Google</title>
 			</options>
 		</var>
 		<var name="soo_user_position" type="select">
