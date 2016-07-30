@@ -2,8 +2,8 @@
 <component version="0.2">
 	<title xml:lang="ko">지도</title>
 	<title xml:lang="en">Maps</title>
-	<description xml:lang="ko">지도를 원하는 곳에 추가하거나 수정할 수 있습니다. Google Maps API, 다음 지도 API, 다음 로컬 API 등이 사용되었습니다.</description>
-	<description xml:lang="en">Maps can be inserted in your documents. Google Maps API, Daum Maps API, Daum Local API and some other APIs are included.</description>
+	<description xml:lang="ko">지도를 원하는 곳에 추가하거나 수정할 수 있습니다. OpenStreetMap, Google Maps API, 다음 지도 API, 다음 로컬 API 등이 사용되었습니다.</description>
+	<description xml:lang="en">Maps can be inserted in your documents. OpenStreetMap, Google Maps API, Daum Maps API, Daum Local API and some other APIs are included.</description>
 	<version>1.4</version>
 	<date>2016-07-30</date>
 	<license link="http://www.gnu.org/licenses/gpl-3.0.html">GPLv3</license>
@@ -49,7 +49,7 @@
 		<var name="soo_user_position" type="select">
 			<title xml:lang="ko">지도에 독자 위치 표시</title>
 			<title xml:lang="en">Display the position of a reader on the map</title>
-			<description xml:lang="ko">지도에 지도를 보고 있는 사람의 위치를 나타냅니다.</description>
+			<description xml:lang="ko">지도에 본문 내용 중 지도를 보고 있는 사람의 위치를 나타냅니다.</description>
 			<description xml:lang="en">Display the position of a reader on the map</description>
 			<options value="N">
 				<title xml:lang="ko">표시 안 함</title>
