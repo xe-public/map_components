@@ -53,7 +53,8 @@ function displayMarkerAllMaps(locPosition) {
 		if(typeof(user_markers[key]) == "undefined") {
 			user_markers[key] = new L.marker(locPosition,
 			{
-				draggable: false
+				draggable: false,
+				icon: user_image
 			}
 		);
 			user_markers[key].addTo(target_map);
@@ -71,6 +72,8 @@ jQuery(document).ready(function() {
 			iconUrl: request_uri + './modules/editor/components/map_components/front/images/person.png',
 			// This marker is 20 pixels wide by 32 pixels high.
 			iconSize: [30, 30],
+			shadowUrl: null,
+			shadowRetinaUrl: null,
 			// The anchor for this image is the base of the flagpole at (0, 32).
 			iconAnchor: [15, 15],
 			popupAnchor: [0, 15]
