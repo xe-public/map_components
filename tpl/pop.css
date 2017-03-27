@@ -6,7 +6,7 @@ body, html {
 	-moz-text-size-adjust: 100%;
 	margin: 0;
 	padding: 0;
-	font-family: '나눔고딕', NanumGothic, '맑은 고딕', Sans-Serif;
+	font-family: "맑은 고딕", "Apple SD Gothic Neo", "나눔고딕", NanumGothic, 'Nanum Gothic', Arial, Helvetica, sans-serif;
 }
 h1 {
 	background-color: #ff3b30;
