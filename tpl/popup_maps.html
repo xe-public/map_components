@@ -1,14 +1,12 @@
+<!--// responsible layout -->
+{Context::addMetaTag("viewport", "width=device-width, user-scalable=no")}
 {@Context::setBrowserTitle($component_info->title);}
-<!--@if($maps_api_type == 'naver')--><!--%import("naver_map.js")-->
+<!--@if($maps_api_type == 'naver')--><!--%import("naver_map.js")--><script>var soo_map_api = "{$soo_map_api}";</script>
 <!--@elseif($maps_api_type == 'daum')--><!--%import("daum_map.js")-->
 <!--@elseif($maps_api_type == 'google')--><!--%import("google_map.js")-->
 <!--@else--><!--%import("../front/leaflet/leaflet.js")--><!--%import("../front/leaflet/leaflet.css")--><!--%import("leaflet.js")--><!--@end-->
 <!--%import("pop.css")-->
 <!--%import("../lang")-->
-{@Context::addHtmlHeader('<meta name="viewport" content="width=device-width, user-scalable=no" /><script>var no_result="'.$lang->msg_no_result.'";'.
-	'var dragmarkertext="'.$lang->soo_drag_marker_text.'";'.
-	'var soo_about_marker="'.$lang->soo_about_marker.'";'.
-	'var soo_langcode="'.$soo_langcode.'";</script>');}
 <div id="bodyDiv">
 	<h1 id="title"><a href="#" onclick="toggle('helpDiv');return false;">{$component_info->title}</a></h1>
 	<div id="controlArea">
@@ -40,3 +38,4 @@
 		</a>
 	</div>
 </div>
+<script>var defaultlat = "{$defaultlat}", defaultlng="{$defaultlat}", dragmarkertext="{$lang->soo_drag_marker_text}", soo_about_marker="{$lang->soo_about_marker}", soo_langcode="{$soo_langcode}";</script>

@@ -290,8 +290,9 @@ function insertMap(obj) {
 	map_zoom = map.getLevel() + 5;
 	map_lat = map.getCenter().getLat();
 	map_lng = map.getCenter().getLng();
-	if(!width) {width = '600';}
-	if(!height) {height = '300';}
+	if(!width || width > 600) {width = 600;}
+	if(!height) {height = 300;}
+	if(height > 640) height = 640;
 
 	//XE에서 속성 삭제하는 방향으로 바뀐다면, alt 에 넣자
 	var img_var = {
@@ -309,14 +310,15 @@ function insertMap(obj) {
 	exec_xml('editor', 'procEditorCall', img_var, function(ret_obj,b) {
 		var results = ret_obj.results; img_data = results;
 
-		var text = "<img src=\"https://maps-api-ssl.google.com/maps/api/staticmap?center="+map_lat+','+map_lng+"&zoom="+map_zoom+"&size="+width+"x"+height;
+		var text = "<img src=\"https://openapi.naver.com/v1/map/staticmap.bin?exception=inimage&format=png&clientId=" + encodeURIComponent(soo_map_api) + "&center="+map_lng+','+map_lat+"&level="+ (map_zoom-5) +"&w="+width+"&h="+height+"&markers=";
 		var positions = map_marker_positions.split(";");
 		for(var i = 0; i < positions.length; i++)
 		{
 			if(!positions[i].trim()) continue;
-			text += "&markers=size:mid|"+positions[i];
+			dummy_p = positions[i].split(",")
+			text += dummy_p[1] + ',' + dummy_p[0] + ',';
 		}
-		text += "&sensor=false\" editor_component=\"map_components\" alt=\""+img_data+"\" style=\"border:2px dotted #FF0033; no-repeat center;width: "+width+"px; height: "+height+"px;\" />";
+		text += "&baselayer=default&url="+ encodeURIComponent(location.hostname) +"\" editor_component=\"map_components\" alt=\""+img_data+"\" style=\"border:2px dotted #FF0033; no-repeat center;width: "+width+"px; height: "+height+"px;\" />";
 
 		opener.editorFocus(opener.editorPrevSrl);
 		var iframe_obj = opener.editorGetIFrame(opener.editorPrevSrl);

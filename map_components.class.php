@@ -84,6 +84,7 @@ class map_components extends EditorHandler {
 		if(!$data) return;
 		$data = base64_encode(serialize($data));
 
+		$this->add("maps_key", $this->soo_map_api);
 		$this->add("results", $data);
 	}
 
@@ -218,12 +219,8 @@ class map_components extends EditorHandler {
 			$this->map_comp_lng = 126.98;
 
 			$map_comp_header_script = '<script src="https://apis.daum.net/maps/maps3.js?apikey='.$this->soo_map_api.'"></script>';
-			$map_comp_header_script .= '<script>'.
-				sprintf(
-					'var defaultlat = "%s";'.
-					'var defaultlng = "%s";'
-					,$this->map_comp_lat,$this->map_comp_lng).
-				'</script>';
+			Context::set('defaultlat', $this->map_comp_lat);
+			Context::set('defaultlng', $this->map_comp_lng);
 			Context::set('soo_langcode', 'ko');
 			Context::set('maps_api_type', $this->maps_api_type);
 			Context::set('tpl_path', $tpl_path);
@@ -235,12 +232,9 @@ class map_components extends EditorHandler {
 			$this->map_comp_lng = 126.98;
 
 			$map_comp_header_script = '<script src="https://openapi.map.naver.com/openapi/v2/maps.js?clientId='.$this->soo_map_api.'"></script>';
-			$map_comp_header_script .= '<script>'.
-				sprintf(
-					'var defaultlat = "%s";'.
-					'var defaultlng = "%s";'
-					,$this->map_comp_lat,$this->map_comp_lng).
-				'</script>';
+			Context::set('soo_map_api', $this->soo_map_api);
+			Context::set('defaultlat', $this->map_comp_lat);
+			Context::set('defaultlng', $this->map_comp_lng);
 			Context::set('soo_langcode', 'ko');
 			Context::set('maps_api_type', $this->maps_api_type);
 			Context::set('tpl_path', $tpl_path);
@@ -265,12 +259,8 @@ class map_components extends EditorHandler {
 			}
 
 			$map_comp_header_script = '<script src="https://maps.googleapis.com/maps/api/js?key=' . $this->soo_map_api . '&amp;language='.$this->langtype.'"></script>';
-			$map_comp_header_script .= '<script>'.
-				sprintf(
-					'var defaultlat="%s";'.
-					'var defaultlng="%s";'
-					,$this->map_comp_lat,$this->map_comp_lng).
-				'</script>';
+			Context::set('defaultlat', $this->map_comp_lat);
+			Context::set('defaultlng', $this->map_comp_lng);
 			Context::set('soo_langcode',$this->langtype);
 			Context::set('tpl_path', $tpl_path);
 			Context::set('maps_api_type', $this->maps_api_type);
@@ -294,16 +284,10 @@ class map_components extends EditorHandler {
 				$this->map_comp_lng = -97;
 			}
 
-			$map_comp_header_script = '';
-			$map_comp_header_script .= '<script>'.
-				sprintf(
-					'var defaultlat = %s;'.
-					'var defaultlng = %s;'
-					,$this->map_comp_lat,$this->map_comp_lng).
-				'</script>';
+			Context::set('defaultlat', $this->map_comp_lat);
+			Context::set('defaultlng', $this->map_comp_lng);
 			Context::set('soo_langcode',$this->langtype);
 			Context::set('tpl_path', $tpl_path);
-			Context::addHtmlHeader($map_comp_header_script);
 		}
 		$oTemplate = &TemplateHandler::getInstance();
 		return $oTemplate->compile($tpl_path, $tpl_file);

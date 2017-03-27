@@ -325,12 +325,12 @@ function insertMap(obj) {
 	};
 	var img_data = '';
 
-	var response_tags = ['error','message','results'];
+	var response_tags = ['error','message','results','maps_key'];
 	exec_xml('editor', 'procEditorCall', img_var, function(ret_obj,b) {
-		var results = ret_obj.results;
+		var results = ret_obj.results, maps_key = ret_obj.maps_key;
 		img_data = results;
 
-		var text = "<img src=\"https://maps-api-ssl.google.com/maps/api/staticmap?center="+map_lat+','+map_lng+"&zoom="+map_zoom+"&size="+width+"x"+height;
+		var text = "<img src=\"https://maps-api-ssl.google.com/maps/api/staticmap?center="+map_lat+','+map_lng+"&zoom="+map_zoom+"&size="+width+"x"+height+"&key="+maps_key;
 		var positions = map_marker_positions.split(";");
 		for(var i = 0; i < positions.length; i++)
 		{

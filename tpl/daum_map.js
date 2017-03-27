@@ -299,14 +299,31 @@ function insertMap(obj) {
 	exec_xml('editor', 'procEditorCall', img_var, function(ret_obj,b) {
 		var results = ret_obj.results; img_data = results;
 
-		var text = "<img src=\"https://maps-api-ssl.google.com/maps/api/staticmap?center="+map_lat+','+map_lng+"&zoom="+map_zoom+"&size="+width+"x"+height;
-		var positions = map_marker_positions.split(";");
-		for(var i = 0; i < positions.length; i++)
+		positions = makeLocationArray(map_marker_positions);
+		static_markers = [];
+
+		// 전체 마커 위치
+		for(i = 0; i < positions.length; i++)
 		{
-			if(!positions[i].trim()) continue;
-			text += "&markers=size:mid|"+positions[i];
+			static_markers[i] ={
+				position: positions[i]
+			};
 		}
-		text += "&sensor=false\" editor_component=\"map_components\" alt=\""+img_data+"\" style=\"border:2px dotted #FF0033; no-repeat center;width: "+width+"px; height: "+height+"px;\" />";
+
+		var dummy_map = document.createElement("div"), 
+			dummy_option = {
+				center: new daum.maps.LatLng(map_lat, map_lng),
+				level: 20 - map_zoom,
+				marker: static_markers
+			};
+
+		var static_map = new daum.maps.StaticMap(dummy_map, dummy_option);
+		static_map = jQuery(dummy_map).find('img');
+		static_map_src = jQuery(static_map).attr('src');
+		static_map_src = static_map_src.replace('IW=0', 'IW=' + width);
+		static_map_src = static_map_src.replace('IH=0', 'IH=' + height);
+
+		var text = "<img src=\""+static_map_src+"\" editor_component=\"map_components\" alt=\""+img_data+"\" style=\"border:2px dotted #FF0033; no-repeat center;width: "+width+"px; height: "+height+"px;\" />";
 
 		opener.editorFocus(opener.editorPrevSrl);
 		var iframe_obj = opener.editorGetIFrame(opener.editorPrevSrl);
