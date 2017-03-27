@@ -130,9 +130,6 @@ function getMaps() {
 			center = new nhn.api.map.LatLng(center_split[0], center_split[1]);
 			map.setCenter(center);
 
-			map_lat = center.getLng();
-			map_lng = center.getLat();
-
 			var markers_split = img_data.map_markers.split(';');
 			map_marker_positions = img_data.map_markers.trim();
 			marker = addMarker(0);

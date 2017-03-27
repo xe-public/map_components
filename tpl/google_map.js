@@ -140,9 +140,6 @@ function getMaps() {
 			center = new google.maps.LatLng(center_split[0], center_split[1]);
 			map.setCenter(center);
 
-			map_lat = center.lng();
-			map_lng = center.lat();
-
 			var markers_split = img_data.map_markers.split(';');
 			map_marker_positions = img_data.map_markers.trim();
 			marker = addMarker(0);

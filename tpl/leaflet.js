@@ -151,9 +151,6 @@ function getMaps() {
 			center = L.latLng(center_split[0], center_split[1]);
 			map.panTo(center);
 
-			map_lat = center.lng;
-			map_lng = center.lat;
-
 		}, response_tags);
 	} else {
 		center = [defaultlat, defaultlng];
