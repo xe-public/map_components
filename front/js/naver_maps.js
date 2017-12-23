@@ -5,17 +5,15 @@ var user_image = [];
 
 function addMarker(target_map, map_marker_positions) {
 	positions = makeLocationArray(map_marker_positions);
-	var oSize = new nhn.api.map.Size(31, 36);
-	var oOffset = new nhn.api.map.Size(15.5, 36);
-	var oIcon = new nhn.api.map.Icon(request_uri + './modules/editor/components/map_components/front/images/marker.png', oSize, oOffset);
 
 	// 전체 마커 생성
 	for(var i = 0; i < positions.length; i++)
 	{
-		var markers = new nhn.api.map.Marker(oIcon, {
-			point: positions[i]
+		var markers = new naver.maps.Marker({
+			position: positions[i],
+			map: target_map,
+			draggable: false
 		});
-		target_map.addOverlay(markers);
 	}
 
 }
@@ -26,7 +24,7 @@ function makeLocationArray(str_position) {
 	{
 		if(!positions[i].trim()) continue;
 		var position = positions[i].split(",");
-		arr_positons[i] = new nhn.api.map.LatLng(position[0],position[1]);
+		arr_positons[i] = new naver.maps.LatLng(position[0],position[1]);
 	}
 	return arr_positons;
 }
@@ -34,15 +32,23 @@ function makeLocationArray(str_position) {
 // 모든 지도에 같은 마커를 표시하는 함수입니다
 function displayMarkerAllMaps(locPosition) {
 	ggl_map.forEach(function(target_map, key) {
-
 		if(typeof(user_markers[key]) == "undefined") {
-			user_markers[key] = new nhn.api.map.Marker(user_image, {
-				point: locPosition
+			/*user_markers[key] = new naver.maps.Marker({
+				position: locPosition,
+				map: target_map,
+				icon: user_image
 			});
-			target_map.addOverlay(user_markers[key]);
+			*/
+			
+			user_markers[key] = new naver.maps.Marker({
+				position: locPosition,
+				map: target_map,
+				icon: user_image,
+				draggable: false
+			});
 		}
 		else{
-			user_markers[key].setPoint(locPosition);
+			user_markers[key].setPosition(locPosition);
 		}
 	});
 }
@@ -50,11 +56,13 @@ function displayMarkerAllMaps(locPosition) {
 jQuery(document).ready(function() {
 	if(map_component_user_position == 'Y') {
 		// 사용자 위치 마커 이미지
-		user_image = new nhn.api.map.Icon(
-				request_uri + './modules/editor/components/map_components/front/images/person.png',
-				new nhn.api.map.Size(30, 30),
-				new nhn.api.map.Size(15, 15)
-			);
+		user_image = {
+			url: request_uri + './modules/editor/components/map_components/front/images/person.png',
+			size: new naver.maps.Size(350, 350),
+			scaledSize: new naver.maps.Size(30, 30),
+			origin: new naver.maps.Point(0, 0),
+			anchor: new naver.maps.Point(15, 15),
+		};
 
 		// HTML5의 geolocation으로 사용할 수 있는지 확인합니다
 		if ("geolocation" in navigator) {
@@ -70,7 +78,7 @@ jQuery(document).ready(function() {
 				var lat = position.coords.latitude, // 위도
 					lon = position.coords.longitude; // 경도
 
-				var locPosition = new nhn.api.map.LatLng(lat, lon); // 마커가 표시될 위치를 geolocation으로 얻어온 좌표로 생성합니다.
+				var locPosition = new naver.maps.LatLng(lat, lon); // 마커가 표시될 위치를 geolocation으로 얻어온 좌표로 생성합니다.
 
 				// 마커를 표시합니다
 				displayMarkerAllMaps(locPosition);

@@ -114,9 +114,12 @@ class map_components extends EditorHandler {
 			'ssl_verify_peer' => FALSE,
 			'ssl_verify_host' => FALSE
 		);
+
 		$xml = '';
 		$xml = FileHandler::getRemoteResource($uri, null, 3, 'GET', 'application/xml', $headers, array(), array(), $request_config);
 
+			print($xml);
+			exit;
 		$xml = preg_replace("/<\?xml([.^>]*)\?>/i", "", $xml);
 
 		$oXmlParser = new XmlParser();
@@ -131,7 +134,7 @@ class map_components extends EditorHandler {
 
 		// API 종류 정하기 다음/네이버/구글
 		$this->maps_api_type = $this->getApiHost($this->soo_map_api);
-
+/*
 		$uri = sprintf('http://maps.googleapis.com/maps/api/geocode/xml?address=%s&sensor=false&language=%s',urlencode($address),urlencode($this->langtype));
 		$xml_doc = $this->xml_api_request($uri);
 
@@ -151,9 +154,9 @@ class map_components extends EditorHandler {
 			}
 
 		}
-
+*/
 		if($this->maps_api_type == 'naver') {
-			$uri = sprintf('https://openapi.naver.com/v1/map/geocode?key=%s&encoding=utf-8&output=xml&coord=latlng&query=%s',$this->soo_map_api,urlencode($address));
+			$uri = sprintf('https://openapi.naver.com/v1/map/geocode.xml?encoding=utf-8&coordType=latlng&query=%s', urlencode($address));
 			$header = array(
 				'X-Naver-Client-Id' => $this->soo_map_api,
 				'X-Naver-Client-Secret' => $this->soo_naver_secret_key
@@ -231,7 +234,7 @@ class map_components extends EditorHandler {
 			$this->map_comp_lat = 37.57;
 			$this->map_comp_lng = 126.98;
 
-			$map_comp_header_script = '<script src="https://openapi.map.naver.com/openapi/v2/maps.js?clientId='.$this->soo_map_api.'"></script>';
+			$map_comp_header_script = '<script src="https://openapi.map.naver.com/openapi/v3/maps.js?clientId='.$this->soo_map_api.'"></script>';
 			Context::set('soo_map_api', $this->soo_map_api);
 			Context::set('defaultlat', $this->map_comp_lat);
 			Context::set('defaultlng', $this->map_comp_lng);
@@ -307,7 +310,7 @@ class map_components extends EditorHandler {
 		//한 페이지 내에 지도 수
 		$map_count = Context::get('pub_maps_count');
 		if(!$map_count) {
-			$map_count=1;
+			$map_count=0;
 		} else {
 			$map_count=$map_count+1;
 		}
@@ -327,14 +330,14 @@ class map_components extends EditorHandler {
 		if(!$height) {$height = 300;}
 
 		$header_script = '';
-		if($map_count==1) {
+		if($map_count===0) {
 			if($this->maps_api_type == 'daum')
 			{
 				$header_script .= '<script src="https://apis.daum.net/maps/maps3.js?apikey='.$this->soo_map_api.'"></script><script>var ggl_map = [],map_component_user_position = "' . $this->soo_user_position . '";</script><style>div.soo_maps{display:block;position:relative;} div.soo_maps img{max-width:none;}div.soo_maps>a>img{max-width:100%;}</style>'."\n";
 			}
 			elseif($this->maps_api_type == 'naver')
 			{
-				$header_script .= '<script src="https://openapi.map.naver.com/openapi/v2/maps.js?clientId='.$this->soo_map_api.'"></script><script>var ggl_map = [],map_component_user_position = "' . $this->soo_user_position . '";</script><style>div.soo_maps {display:block;position:relative;} div.soo_maps img {max-width:none;}div.soo_maps>a>img {max-width:100%;}</style>'."\n";
+				$header_script .= '<script src="https://openapi.map.naver.com/openapi/v3/maps.js?clientId='.$this->soo_map_api.'"></script><script>var ggl_map = [],map_component_user_position = "' . $this->soo_user_position . '";</script><style>div.soo_maps {display:block;position:relative;} div.soo_maps img {max-width:none;}div.soo_maps>a>img {max-width:100%;}</style>'."\n";
 			}
 			elseif($this->maps_api_type == 'google')
 			{
@@ -381,15 +384,9 @@ class map_components extends EditorHandler {
 			Context::loadFile(array('./modules/editor/components/map_components/front/js/naver_maps.js', 'head', '', null), true);
 			$header_script .= '<script>'.
 				'function ggl_map_init'.$map_count.'() {'.
-					'var mapOption = { zoom: '.$zoom.', point: new nhn.api.map.LatLng('.$lat.', '.$lng.'), enableWheelZoom : true, enableDragPan : true, enableDblClickZoom : true, mapMode : 0, activateTrafficMap : false, activateBicycleMap : false, };'.
+					'var mapOption = { zoom: '.$zoom.', center: new naver.maps.LatLng('.$lat.', '.$lng.') };'.
 					'var marker_points = "'.$map_markers.'";'.
-					'ggl_map['.$map_count.'] = new nhn.api.map.Map("ggl_map_canvas'.$map_count.'", mapOption);'.
-					'var zoomControl = new nhn.api.map.ZoomControl();'.
-					'ggl_map['.$map_count.'].addControl(zoomControl);'.
-					'zoomControl.setPosition({ top : 10, left : 10 });'.
-					'var mapTypeControl = new nhn.api.map.MapTypeBtn();'.
-					'ggl_map['.$map_count.'].addControl(mapTypeControl);'.
-					'mapTypeControl.setPosition({ top : 10, right : 10 });'.
+					'ggl_map['.$map_count.'] = new naver.maps.Map("ggl_map_canvas'.$map_count.'", mapOption);'.
 					'addMarker(ggl_map['.$map_count.'],marker_points)}</script>';
 			$zoom = intval($zoom)+5;
 		}
