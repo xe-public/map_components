@@ -118,8 +118,6 @@ class map_components extends EditorHandler {
 		$xml = '';
 		$xml = FileHandler::getRemoteResource($uri, null, 3, 'GET', 'application/xml', $headers, array(), array(), $request_config);
 
-			print($xml);
-			exit;
 		$xml = preg_replace("/<\?xml([.^>]*)\?>/i", "", $xml);
 
 		$oXmlParser = new XmlParser();
