@@ -116,9 +116,9 @@ class map_components extends EditorHandler {
 		);
 
 		$xml = '';
-		$xml = FileHandler::getRemoteResource($uri, null, 3, 'GET', 'application/xml', $headers, array(), array(), $request_config);
+		$xml = FileHandler::getRemoteResource($uri, null, 5, 'GET', 'application/xml', $headers, array(), array(), $request_config);
 
-		$xml = preg_replace("/<\?xml([.^>]*)\?>/i", "", $xml);
+		$xml = preg_replace("/<\?xml([^>]*)\?>/i", "", $xml);
 
 		$oXmlParser = new XmlParser();
 		$xml_doc = $oXmlParser->parse($xml);
@@ -132,8 +132,9 @@ class map_components extends EditorHandler {
 
 		// API 종류 정하기 다음/네이버/구글
 		$this->maps_api_type = $this->getApiHost($this->soo_map_api);
-/*
-		$uri = sprintf('http://maps.googleapis.com/maps/api/geocode/xml?address=%s&sensor=false&language=%s',urlencode($address),urlencode($this->langtype));
+
+		// 구글 장소명-좌표 변환 API
+		$uri = sprintf('https://maps.googleapis.com/maps/api/geocode/xml?address=%s&sensor=false&language=%s',urlencode($address),urlencode($this->langtype));
 		$xml_doc = $this->xml_api_request($uri);
 
 		$item = $xml_doc->geocoderesponse->result;
@@ -152,9 +153,10 @@ class map_components extends EditorHandler {
 			}
 
 		}
-*/
+
+		// 네이버 주소-좌표 변환 API. 구글과 달리 Point of interest 검색은 되지 않는다. (예전엔 되더니...)
 		if($this->maps_api_type == 'naver') {
-			$uri = sprintf('https://openapi.naver.com/v1/map/geocode.xml?encoding=utf-8&coordType=latlng&query=%s', urlencode($address));
+			$uri = sprintf('https://openapi.naver.com/v1/map/geocode.xml?query=%s', urlencode($address));
 			$header = array(
 				'X-Naver-Client-Id' => $this->soo_map_api,
 				'X-Naver-Client-Secret' => $this->soo_naver_secret_key
@@ -180,11 +182,15 @@ class map_components extends EditorHandler {
 			}
 		}
 
+		// 카카오 장소키워드-좌표 검색
 		if($this->soo_daum_local_api_key) {
-			$uri = sprintf('http://apis.daum.net/local/v1/search/keyword.xml?apikey=%s&query=%s&output=xml',$this->soo_daum_local_api_key,urlencode($address));
-			$xml_doc = $this->xml_api_request($uri);
+			$uri = sprintf('https://dapi.kakao.com/v2/local/search/keyword.xml?query=%s',urlencode($address));
+			$header = array(
+				'Authorization' => 'KakaoAK ' . $this->soo_daum_local_api_key
+			);
+			$xml_doc = $this->xml_api_request($uri, $header);
 
-			$item = $xml_doc->channel->item;
+			$item = $xml_doc->result->documents;
 			if(!is_array($item)) $item = array($item);
 			$item_count = count($item);
 
@@ -194,11 +200,11 @@ class map_components extends EditorHandler {
 					$input_obj = '';
 					$j = $i-$result_orgin_count;
 					$input_obj = $item[$j];
-					if(!$input_obj->title->body) continue;
-					$result[$i]->formatted_address = $input_obj->title->body;
-					$result[$i]->geometry->lng = $input_obj->longitude->body;
-					$result[$i]->geometry->lat = $input_obj->latitude->body;
-					$result[$i]->result_from = 'Daum';
+					if(!$input_obj->place_name->body) continue;
+					$result[$i]->formatted_address = $input_obj->place_name->body;
+					$result[$i]->geometry->lng = $input_obj->x->body;
+					$result[$i]->geometry->lat = $input_obj->y->body;
+					$result[$i]->result_from = 'KAKAO';
 				}
 			}
 		}
@@ -219,7 +225,7 @@ class map_components extends EditorHandler {
 			$this->map_comp_lat = 37.57;
 			$this->map_comp_lng = 126.98;
 
-			$map_comp_header_script = '<script src="https://apis.daum.net/maps/maps3.js?apikey='.$this->soo_map_api.'"></script>';
+			$map_comp_header_script = '<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey='.$this->soo_map_api.'"></script>';
 			Context::set('defaultlat', $this->map_comp_lat);
 			Context::set('defaultlng', $this->map_comp_lng);
 			Context::set('soo_langcode', 'ko');
@@ -382,7 +388,7 @@ class map_components extends EditorHandler {
 			Context::loadFile(array('./modules/editor/components/map_components/front/js/naver_maps.js', 'head', '', null), true);
 			$header_script .= '<script>'.
 				'function ggl_map_init'.$map_count.'() {'.
-					'var mapOption = { zoom: '.$zoom.', center: new naver.maps.LatLng('.$lat.', '.$lng.') };'.
+					'var mapOption = { zoom: '.$zoom.', center: new naver.maps.LatLng('.$lat.', '.$lng.'), mapTypeControl: true, zoomControl: true };'.
 					'var marker_points = "'.$map_markers.'";'.
 					'ggl_map['.$map_count.'] = new naver.maps.Map("ggl_map_canvas'.$map_count.'", mapOption);'.
 					'addMarker(ggl_map['.$map_count.'],marker_points)}</script>';
@@ -405,7 +411,7 @@ class map_components extends EditorHandler {
 			Context::loadFile(array('./modules/editor/components/map_components/front/js/leaflets.js', 'head', '', null), true);
 			$header_script .= '<script>'.
 				'function ggl_map_init'.$map_count.'() {'.
-					'var mapOption = { zoom: ' . $zoom . ', center: new L.latLng('.$lat.', '.$lng.'), layers: L.tileLayer(randomTile(), {attribution: \'Map data &copy; <a target="_blank" href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a target="_blank" href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>\'})};'.
+					'var mapOption = { zoom: ' . $zoom . ', center: new L.latLng('.$lat.', '.$lng.'), layers: L.tileLayer(randomTile(), {attribution: \'Map data &copy; <a target="_blank" href="https://openstreetmap.org">OpenStreetMap</a> contributors, <a target="_blank" href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>\'})};'.
 					'var marker_points = "'.$map_markers.'";'.
 					'ggl_map['.$map_count.'] = new L.map(document.getElementById("ggl_map_canvas'.$map_count.'"), mapOption);'.
 					'ggl_map['.$map_count.'].setZoom(' . $zoom . ');'.

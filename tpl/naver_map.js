@@ -86,7 +86,7 @@ function address_adder(results) {
 		if(results[i].formatted_address || results[i].formatted_address !== null) {
 			result_array[i] = { from: results[i].result_from,
 				formatted_address: results[i].formatted_address,
-				geometry: {location : new naver.maps.LatLng(results[i].geometry.lat(), results[i].geometry.lng()) } };
+				geometry: {location : new naver.maps.LatLng(results[i].geometry.lat, results[i].geometry.lng) } };
 		}
 	}
 	view_list();
