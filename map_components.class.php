@@ -337,7 +337,7 @@ class map_components extends EditorHandler {
 		if($map_count===0) {
 			if($this->maps_api_type == 'daum')
 			{
-				$header_script .= '<script src="https://apis.daum.net/maps/maps3.js?apikey='.$this->soo_map_api.'"></script><script>var ggl_map = [],map_component_user_position = "' . $this->soo_user_position . '";</script><style>div.soo_maps{display:block;position:relative;} div.soo_maps img{max-width:none;}div.soo_maps>a>img{max-width:100%;}</style>'."\n";
+				$header_script .= '<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey='.$this->soo_map_api.'"></script><script>var ggl_map = [],map_component_user_position = "' . $this->soo_user_position . '";</script><style>div.soo_maps{display:block;position:relative;} div.soo_maps img{max-width:none;}div.soo_maps>a>img{max-width:100%;}</style>'."\n";
 			}
 			elseif($this->maps_api_type == 'naver')
 			{
