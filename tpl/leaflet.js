@@ -115,7 +115,7 @@ function getMaps() {
 	};
 	map = new L.map(document.getElementById("map_canvas"), mapOption);
 
-	L.tileLayer(randomTile(), {attribution: 'Map data &copy; <a target="_blank" href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a target="_blank" href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'}).addTo(map);
+	L.tileLayer(randomTile(), {attribution: 'Map data &copy; <a target="_blank" href="https://openstreetmap.org">OpenStreetMap</a> contributors, <a target="_blank" href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'}).addTo(map);
 	L.control.scale().addTo(map);
 
 	if(typeof(opener) !="undefined" && opener !== null)
@@ -139,17 +139,17 @@ function getMaps() {
 
 			img_data = ret_obj.results;
 
+
 			var markers_split = img_data.map_markers.split(';');
 			map_marker_positions = img_data.map_markers.trim();
 			marker = addMarker(0);
 
 			map_zoom = parseInt(img_data.map_zoom,10);
 			if(!map_zoom) map_zoom = 13;
-			map.setZoom(map_zoom);
 
 			var center_split = img_data.map_center.split(',');
 			center = L.latLng(center_split[0], center_split[1]);
-			map.panTo(center);
+			map.setView(center, map_zoom);
 
 		}, response_tags);
 	} else {
