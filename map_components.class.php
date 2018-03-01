@@ -313,14 +313,14 @@ class map_components extends EditorHandler {
 
 		//한 페이지 내에 지도 수
 		$map_count = Context::get('pub_maps_count');
-		if(!$map_count) {
-			$map_count=0;
+
+		if(!isset($map_count)) {
+			$map_count = 0;
 		} else {
-			$map_count=$map_count+1;
+			$map_count = $map_count+1;
 		}
 		Context::set('pub_maps_count' , $map_count);
 		$data = unserialize(base64_decode($xml_obj->attrs->alt));
-
 		//지도 표시 시작 start viewing the map.
 		$style = trim($xml_obj->attrs->style).';';
 		preg_match('/width([ ]*)\:([0-9 a-z\.]+)\;/i', $style, $width_style);
