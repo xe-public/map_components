@@ -64,7 +64,7 @@ class map_components extends EditorHandler {
 				}
 				$this->maps_api_type = 'daum';
 			}
-			elseif(strlen($api_key) == 32 || strlen($api_key) == 20)
+			elseif(strlen($api_key) == 32 || strlen($api_key) == 20 || strlen($api_key) == 10 || trim($this->soo_map_api_type) === 'naver_cp' || trim($this->soo_map_api_type) === 'naver_gov')
 			{
 				$this->maps_api_type = 'naver';
 			}
@@ -126,6 +126,20 @@ class map_components extends EditorHandler {
 		return $xml_doc;
 	}
 
+	function json_api_request($uri, $headers = null) {
+		$request_config = array(
+			'ssl_verify_peer' => FALSE,
+			'ssl_verify_host' => FALSE
+		);
+
+		$json = '';
+		$json = FileHandler::getRemoteResource($uri, null, 5, 'GET', 'application/json', $headers, array(), array(), $request_config);
+
+		$json_doc = json_decode($json);
+
+		return $json_doc;
+	}
+
 	function search() {
 		$address = Context::get('address');
 		if(!$address) return;
@@ -156,30 +170,61 @@ class map_components extends EditorHandler {
 
 		// 네이버 주소-좌표 변환 API. 구글과 달리 Point of interest 검색은 되지 않는다. (예전엔 되더니...)
 		if($this->maps_api_type == 'naver') {
-			$uri = sprintf('https://openapi.naver.com/v1/map/geocode.xml?query=%s', urlencode($address));
-			$header = array(
-				'X-Naver-Client-Id' => $this->soo_map_api,
-				'X-Naver-Client-Secret' => $this->soo_naver_secret_key
-			);
-			$xml_doc = $this->xml_api_request($uri, $header);
+			
+			if(trim($this->soo_map_api_type) === 'naver_cp' || trim($this->soo_map_api_type) === 'naver_gov')
+			{
+				$uri = sprintf('https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query=%s', urlencode($address));
+				$header = array(
+					'X-NCP-APIGW-API-KEY-ID' => $this->soo_map_api,
+					'X-NCP-APIGW-API-KEY' => $this->soo_naver_secret_key
+				);
+				$json_doc = $this->json_api_request($uri, $header);
+				$item = $json_doc->addresses;
 
-			$item = $xml_doc->result->items->item;
-			if(!is_array($item)) $item = array($item);
-			$item_count = count($item);
-			if($item_count > 0) {
-				$result_orgin_count = count($result);
-				for($i=$result_orgin_count;($i-$result_orgin_count)<$item_count;$i++) {
-					$input_obj = '';
-					$j = $i-$result_orgin_count;
-					$input_obj = $item[$j];
-					if(!$input_obj->address->body) continue;
-					$result[$i]->formatted_address = str_replace('  ', ' ', trim($input_obj->address->body));
-					$result[$i]->geometry->lng = $input_obj->point->x->body;
-					$result[$i]->geometry->lat = $input_obj->point->y->body;
-					$result[$i]->result_from = 'Naver';
+				if(!is_array($item)) $item = array($item);
+				$item_count = count($item);
+				if($item_count > 0) {
+					$result_orgin_count = count($result);
+					for($i=$result_orgin_count;($i-$result_orgin_count)<$item_count;$i++) {
+						$input_obj = '';
+						$j = $i-$result_orgin_count;
+						$input_obj = $item[$j];
+						if(!$input_obj->x) continue;
+						$result[$i]->formatted_address = str_replace('  ', ' ', trim($input_obj->roadAddress));
+						$result[$i]->geometry->lng = $input_obj->x;
+						$result[$i]->geometry->lat = $input_obj->y;
+						$result[$i]->result_from = 'Naver';
+					}
 				}
-
 			}
+			else {
+				$uri = sprintf('https://openapi.naver.com/v1/map/geocode.xml?query=%s', urlencode($address));
+				$header = array(
+					'X-Naver-Client-Id' => $this->soo_map_api,
+					'X-Naver-Client-Secret' => $this->soo_naver_secret_key
+				);
+				$xml_doc = $this->xml_api_request($uri, $header);
+				$item = $xml_doc->result->items->item;
+				
+				if(!is_array($item)) $item = array($item);
+				$item_count = count($item);
+				if($item_count > 0) {
+					$result_orgin_count = count($result);
+					for($i=$result_orgin_count;($i-$result_orgin_count)<$item_count;$i++) {
+						$input_obj = '';
+						$j = $i-$result_orgin_count;
+						$input_obj = $item[$j];
+						if(!$input_obj->address->body) continue;
+						$result[$i]->formatted_address = str_replace('  ', ' ', trim($input_obj->address->body));
+						$result[$i]->geometry->lng = $input_obj->point->x->body;
+						$result[$i]->geometry->lat = $input_obj->point->y->body;
+						$result[$i]->result_from = 'Naver';
+					}
+
+				}
+			}
+
+
 		}
 
 		// 카카오 장소키워드-좌표 검색
@@ -238,7 +283,12 @@ class map_components extends EditorHandler {
 			$this->map_comp_lat = 37.57;
 			$this->map_comp_lng = 126.98;
 
-			$map_comp_header_script = '<script src="https://openapi.map.naver.com/openapi/v3/maps.js?clientId='.$this->soo_map_api.'"></script>';
+			if(trim($this->soo_map_api_type) === 'naver_cp')
+				$map_comp_header_script = '<script src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId='.$this->soo_map_api.'"></script>';
+			elseif(trim($this->soo_map_api_type) === 'naver_gov')
+				$map_comp_header_script = '<script src="https://openapi.map.naver.com/openapi/v3/maps.js?govClientId='.$this->soo_map_api.'"></script>';
+			else
+				$map_comp_header_script = '<script src="https://openapi.map.naver.com/openapi/v3/maps.js?clientId='.$this->soo_map_api.'"></script>';
 			Context::set('soo_map_api', $this->soo_map_api);
 			Context::set('defaultlat', $this->map_comp_lat);
 			Context::set('defaultlng', $this->map_comp_lng);
@@ -341,7 +391,15 @@ class map_components extends EditorHandler {
 			}
 			elseif($this->maps_api_type == 'naver')
 			{
-				$header_script .= '<script src="https://openapi.map.naver.com/openapi/v3/maps.js?clientId='.$this->soo_map_api.'"></script><script>var ggl_map = [],map_component_user_position = "' . $this->soo_user_position . '";</script><style>div.soo_maps {display:block;position:relative;} div.soo_maps img {max-width:none;}div.soo_maps>a>img {max-width:100%;}</style>'."\n";
+				
+				if(trim($this->soo_map_api_type) === 'naver_cp')
+					$header_script .= '<script src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId='.$this->soo_map_api.'"></script>';
+				elseif(trim($this->soo_map_api_type) === 'naver_gov')
+					$header_script .= '<script src="https://openapi.map.naver.com/openapi/v3/maps.js?govClientId='.$this->soo_map_api.'"></script>';
+				else
+					$header_script .= '<script src="https://openapi.map.naver.com/openapi/v3/maps.js?clientId='.$this->soo_map_api.'"></script>';
+
+				$header_script .= '<script>var ggl_map = [],map_component_user_position = "' . $this->soo_user_position . '";</script><style>div.soo_maps {display:block;position:relative;} div.soo_maps img {max-width:none;}div.soo_maps>a>img {max-width:100%;}</style>'."\n";
 			}
 			elseif($this->maps_api_type == 'google')
 			{
