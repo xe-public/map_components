@@ -318,15 +318,15 @@ function insertMap(obj) {
 		var results = ret_obj.results, maps_key = ret_obj.maps_key;
 		img_data = results;
 
-		var text = "<img src=\"https://openapi.naver.com/v1/map/staticmap.bin?exception=inimage&format=png&clientId=" + encodeURIComponent(soo_map_api) + "&center="+map_lng+','+map_lat+"&level="+ (map_zoom-5) +"&w="+width+"&h="+height+"&markers=";
+		var text = "<img src=\"https://static-maps.yandex.ru/1.x/?lang=en-US&ll="+map_lng+','+map_lat+"&z="+map_zoom+"&l=map,skl&size="+width+","+height+"&pt=";
 		var positions = map_marker_positions.split(";");
 		for(var i = 0; i < positions.length; i++)
 		{
 			if(!positions[i].trim()) continue;
 			i_position = positions[i].split(",");
-			text += i_position[1] + ',' + i_position[0] + ',';
+			text += i_position[1] + ',' + i_position[0] + ',vkgrm~-';
 		}
-		text += "&baselayer=default&url="+ encodeURIComponent(location.hostname) +"\" editor_component=\"map_components\" alt=\""+img_data+"\" style=\"border:2px dotted #FF0033; no-repeat center;width: "+width+"px; height: "+height+"px;\" />";
+		text += "\" editor_component=\"map_components\" alt=\""+img_data+"\" style=\"border:2px dotted #FF0033; no-repeat center;width: "+width+"px; height: "+height+"px;\" />";
 
 		opener.editorFocus(opener.editorPrevSrl);
 		var iframe_obj = opener.editorGetIFrame(opener.editorPrevSrl);
