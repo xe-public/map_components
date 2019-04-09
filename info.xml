@@ -30,7 +30,7 @@
 			<description>https://developers.naver.com/appinfo 에서 앱 등록 후 Client Secret 키를 발급받은 후 입력해주세요.</description>
 		</var>
 		<var name="soo_map_api_type" type="select">
-			<title xml:lang="ko">지도 API Key 발급자(카카오, 구글 API 사용시 권장)</title>
+			<title xml:lang="ko">지도 API Key 발급자(권장)</title>
 			<title xml:lang="en">Maps API Key Distributors (Recommend)</title>
 			<description xml:lang="ko">API Key 가 사용되는 지도를 사용할 경우 선택해주시는 것이 좋습니다.</description>
 			<options value="">
@@ -44,6 +44,14 @@
 			<options value="google">
 				<title xml:lang="ko">구글</title>
 				<title xml:lang="en">Google</title>
+			</options>
+			<options value="naver_cp">
+				<title xml:lang="ko">네이버 클라우드 플랫폼</title>
+				<title xml:lang="en">Naver Cloud Platform</title>
+			</options>
+			<options value="naver_gov">
+				<title xml:lang="ko">네이버 (공공)</title>
+				<title xml:lang="en">Naver (Gov)</title>
 			</options>
 		</var>
 		<var name="soo_user_position" type="select">
