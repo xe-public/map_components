@@ -318,15 +318,23 @@ function insertMap(obj) {
 		var results = ret_obj.results, maps_key = ret_obj.maps_key;
 		img_data = results;
 
-		var text = "<img src=\"https://static-maps.yandex.ru/1.x/?lang=en-US&ll="+map_lng+','+map_lat+"&z="+map_zoom+"&l=map,skl&size="+width+","+height+"&pt=";
+		
+		var img_url = "https://naveropenapi.apigw.ntruss.com/map-static/v2/raster-cors?w="+width+"&amp;h="+height+"&amp;center="+map_lng+','+map_lat+"&amp;level="+map_zoom+"&amp;X-NCP-APIGW-API-KEY-ID="+encodeURIComponent(soo_map_api);
+		
 		var positions = map_marker_positions.split(";");
 		for(var i = 0; i < positions.length; i++)
 		{
+			if ( i == 0 ) {
+				img_url += "&amp;markers=type:d|size:mid|pos:"
+			}
 			if(!positions[i].trim()) continue;
 			i_position = positions[i].split(",");
-			text += i_position[1] + ',' + i_position[0] + ',vkgrm~-';
+			img_url += i_position[1] + encodeURIComponent(' ') + i_position[0] + encodeURIComponent(',');
 		}
-		text += "\" editor_component=\"map_components\" alt=\""+img_data+"\" style=\"border:2px dotted #FF0033; no-repeat center;width: "+width+"px; height: "+height+"px;\" />";
+		
+		var high_res_img = img_url + "&amp;scale=2";
+		
+		var text = "<img src=\"" + img_url + "\" srcset=\"" + img_url + ' 1x,' + high_res_img + " 2x\" editor_component=\"map_components\" alt=\""+img_data+"\" style=\"border:2px dotted #FF0033; no-repeat center;width: "+width+"px; height: "+height+"px;\" />";
 
 		opener.editorFocus(opener.editorPrevSrl);
 		var iframe_obj = opener.editorGetIFrame(opener.editorPrevSrl);
