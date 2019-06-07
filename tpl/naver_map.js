@@ -1,4 +1,4 @@
-/* Map Component by MinSoo Kim. (c) 2014 MinSoo Kim. (misol.kr@gmail.com) */
+/* Map Component by Min-Soo Kim. (c) 2019 Min-Soo Kim. (misol.kr@gmail.com) */
 var map_zoom = 13,
 	map_lat = '',
 	map_lng = '',
@@ -95,7 +95,7 @@ function address_adder(results) {
 function getMaps() {
 	var node;
 	var mapOption = {
-		zoom: (map_zoom - 5),
+		zoom: (map_zoom - 4),
 		center: new naver.maps.LatLng(defaultlat, defaultlng),
 		mapTypeControl: true,
 		zoomControl: true,
@@ -135,7 +135,7 @@ function getMaps() {
 			map_marker_positions = img_data.map_markers.trim();
 			marker = addMarker(0);
 
-			map_zoom = (parseInt(img_data.map_zoom,10) - 5);
+			map_zoom = (parseInt(img_data.map_zoom,10) - 4);
 			if(!map_zoom) map_zoom = 13;
 			map.setZoom(map_zoom);
 		}, response_tags);
@@ -295,7 +295,7 @@ function insertMap(obj) {
 	if(typeof(opener)=="undefined" || !opener) return;
 	var width = jQuery("#width").val(), height = jQuery("#height").val();
 
-	map_zoom = map.getZoom()+5;
+	map_zoom = map.getZoom()+4;
 	map_lat = map.getCenter().lat();
 	map_lng = map.getCenter().lng();
 	if(!width) {width = '600';}
@@ -318,15 +318,23 @@ function insertMap(obj) {
 		var results = ret_obj.results, maps_key = ret_obj.maps_key;
 		img_data = results;
 
-		var text = "<img src=\"https://static-maps.yandex.ru/1.x/?lang=en-US&ll="+map_lng+','+map_lat+"&z="+map_zoom+"&l=map,skl&size="+width+","+height+"&pt=";
+		
+		var img_url = "https://naveropenapi.apigw.ntruss.com/map-static/v2/raster-cors?w="+width+"&amp;h="+height+"&amp;center="+map_lng+','+map_lat+"&amp;level="+(map_zoom-1)+"&amp;X-NCP-APIGW-API-KEY-ID="+encodeURIComponent(soo_map_api);
+		
 		var positions = map_marker_positions.split(";");
 		for(var i = 0; i < positions.length; i++)
 		{
+			if ( i == 0 ) {
+				img_url += "&amp;markers=type:d|size:mid|pos:"
+			}
 			if(!positions[i].trim()) continue;
 			i_position = positions[i].split(",");
-			text += i_position[1] + ',' + i_position[0] + ',vkgrm~-';
+			img_url += i_position[1] + encodeURIComponent(' ') + i_position[0] + encodeURIComponent(',');
 		}
-		text += "\" editor_component=\"map_components\" alt=\""+img_data+"\" style=\"border:2px dotted #FF0033; no-repeat center;width: "+width+"px; height: "+height+"px;\" />";
+		
+		var high_res_img = img_url + "&amp;scale=2";
+		
+		var text = "<img src=\"" + img_url + "\" srcset=\"" + img_url + ' 1x,' + high_res_img + " 2x\" editor_component=\"map_components\" alt=\""+img_data+"\" style=\"border:2px dotted #FF0033; no-repeat center;width: "+width+"px; height: "+height+"px;\" />";
 
 		opener.editorFocus(opener.editorPrevSrl);
 		var iframe_obj = opener.editorGetIFrame(opener.editorPrevSrl);

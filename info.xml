@@ -4,8 +4,8 @@
 	<title xml:lang="en">Maps</title>
 	<description xml:lang="ko">지도를 원하는 곳에 추가하거나 수정할 수 있습니다. OpenStreetMap, Google Maps API, 카카오 지도 API, 카카오 로컬 API, 또는 네이버 지도 API 가 사용되었습니다.</description>
 	<description xml:lang="en">Maps can be inserted in your documents. OpenStreetMap, Google Maps API, KAKAO Maps API, KAKAO Local API, or Naver Maps API are included.</description>
-	<version>1.4.4</version>
-	<date>2018-03-01</date>
+	<version>1.4.5</version>
+	<date>2019-06-07</date>
 	<license link="http://www.gnu.org/licenses/gpl-3.0.html">GPLv3</license>
 	<author email_address="misol.kr@gmail.com" link="https://github.com/misol">
 		<name xml:lang="ko">김민수(misol)</name>
@@ -20,22 +20,22 @@
 			아무 값을 입력하지 않을 경우, 오픈스트리트맵이 나타납니다.</description>
 		</var>
 		<var name="soo_daum_local_api_key">
-			<title xml:lang="ko">카카오 REST API 키 (선택적 필수, 카카오 지도를 사용할 경우)</title>
+			<title xml:lang="ko">카카오 REST API 키 (필수, 카카오 지도를 사용할 경우)</title>
 			<title xml:lang="en">Kakao REST API Key (For KAKAO maps)</title>
 			<description>https://developers.kakao.com/apps 에서 앱 만들기 후, API 키 메뉴에서 REST API 키 항목을 통해 웹 브라우저용 API 키를 발급 받으신 키를 입력해주세요.</description>
 		</var>
 		<var name="soo_naver_secret_key">
-			<title xml:lang="ko">Client Secret(선택적 필수, 네이버 지도를 사용할 경우)</title>
+			<title xml:lang="ko">Client Secret(필수, 네이버 지도를 사용할 경우)</title>
 			<title xml:lang="en">Client Secret (For Naver maps)</title>
 			<description>https://developers.naver.com/appinfo 에서 앱 등록 후 Client Secret 키를 발급받은 후 입력해주세요.</description>
 		</var>
 		<var name="soo_map_api_type" type="select">
-			<title xml:lang="ko">지도 API Key 발급자(권장)</title>
-			<title xml:lang="en">Maps API Key Distributors (Recommend)</title>
-			<description xml:lang="ko">API Key 가 사용되는 지도를 사용할 경우 선택해주시는 것이 좋습니다.</description>
+			<title xml:lang="ko">지도 API Key 발급자</title>
+			<title xml:lang="en">Maps API Key Distributors</title>
+			<description xml:lang="ko">API Key 발급자를 선택해주시는 것이 좋습니다.</description>
 			<options value="">
-				<title xml:lang="ko">자동 선택</title>
-				<title xml:lang="en">Auto selection</title>
+				<title xml:lang="ko">자동 선택 (권장하지 않음)</title>
+				<title xml:lang="en">Auto selection (not recommended)</title>
 			</options>
 			<options value="daum">
 				<title xml:lang="ko">카카오</title>
