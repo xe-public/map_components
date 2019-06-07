@@ -1,4 +1,4 @@
-/* Map Component by MinSoo Kim. (c) 2014 MinSoo Kim. (misol.kr@gmail.com) */
+/* Map Component by Min-Soo Kim. (c) 2014 Min-Soo Kim. (misol.kr@gmail.com) */
 var map_zoom = 13,
 	map_lat = '',
 	map_lng = '',

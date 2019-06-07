@@ -1,4 +1,4 @@
-/* Map Component by MinSoo Kim. (c) 2014 MinSoo Kim. (misol.kr@gmail.com) */
+/* Map Component by Min-Soo Kim. (c) 2019 Min-Soo Kim. (misol.kr@gmail.com) */
 var map_zoom = 13,
 	map_lat = '',
 	map_lng = '',
@@ -95,7 +95,7 @@ function address_adder(results) {
 function getMaps() {
 	var node;
 	var mapOption = {
-		zoom: (map_zoom - 5),
+		zoom: (map_zoom - 4),
 		center: new naver.maps.LatLng(defaultlat, defaultlng),
 		mapTypeControl: true,
 		zoomControl: true,
@@ -135,7 +135,7 @@ function getMaps() {
 			map_marker_positions = img_data.map_markers.trim();
 			marker = addMarker(0);
 
-			map_zoom = (parseInt(img_data.map_zoom,10) - 5);
+			map_zoom = (parseInt(img_data.map_zoom,10) - 4);
 			if(!map_zoom) map_zoom = 13;
 			map.setZoom(map_zoom);
 		}, response_tags);
@@ -295,7 +295,7 @@ function insertMap(obj) {
 	if(typeof(opener)=="undefined" || !opener) return;
 	var width = jQuery("#width").val(), height = jQuery("#height").val();
 
-	map_zoom = map.getZoom()+5;
+	map_zoom = map.getZoom()+4;
 	map_lat = map.getCenter().lat();
 	map_lng = map.getCenter().lng();
 	if(!width) {width = '600';}
@@ -319,7 +319,7 @@ function insertMap(obj) {
 		img_data = results;
 
 		
-		var img_url = "https://naveropenapi.apigw.ntruss.com/map-static/v2/raster-cors?w="+width+"&amp;h="+height+"&amp;center="+map_lng+','+map_lat+"&amp;level="+map_zoom+"&amp;X-NCP-APIGW-API-KEY-ID="+encodeURIComponent(soo_map_api);
+		var img_url = "https://naveropenapi.apigw.ntruss.com/map-static/v2/raster-cors?w="+width+"&amp;h="+height+"&amp;center="+map_lng+','+map_lat+"&amp;level="+(map_zoom-1)+"&amp;X-NCP-APIGW-API-KEY-ID="+encodeURIComponent(soo_map_api);
 		
 		var positions = map_marker_positions.split(";");
 		for(var i = 0; i < positions.length; i++)
